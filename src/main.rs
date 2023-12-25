@@ -1,6 +1,10 @@
 mod print_util;
 mod run;
 mod error_handler;
+mod lexer;
+mod token;
+mod parser;
+mod interpreter;
 
 use crate::print_util::print_error;
 use crate::run::{ run_file, run_prompt };

@@ -1,11 +1,11 @@
-pub struct Error<'a> {
+pub struct ViskumError<'a> {
     str: &'a str,
-    line: u32,
-    column: u16,
+    line: usize,
+    column: usize,
     file: &'a str,
 }
 
-impl<'a> Error<'a> {
+impl<'a> ViskumError<'a> {
     pub fn to_string(&self) -> &str {
         self.str
         // Format error later
