@@ -13,8 +13,10 @@ impl Lexer {
     }
 
     fn advance(&mut self) {
-        self.line_position += 1;
-        self.current += 1;
+        if !self.is_at_end() {
+            self.line_position += 1;
+            self.current += 1;
+        }
     }
 
     fn peek(&self) -> Option<char> {
