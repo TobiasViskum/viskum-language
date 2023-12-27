@@ -1,18 +1,30 @@
+use std::rc::Rc;
+use std::cell::RefCell;
+
+use crate::error_handler::ErrorHandler;
 use crate::print_util::print_error;
 use crate::lexer::Lexer;
-use crate::token::Token;
 
-use std::io::{ self, BufRead };
-use std::io::Result;
+use std::io::{ self, BufRead, Result, stdout, Write };
 use std::process;
 
 fn run(source: &str) {
-    let lexer = Lexer { source: source, tokens: vec![] };
+    let error_handler = Rc::new(RefCell::new(ErrorHandler::new()));
 
-    let tokens: Vec<Token> = lexer.scan_tokens();
+    let error_handler_ref = Rc::clone(&error_handler);
 
-    for token in tokens {
-        println!("{}", token);
+    let mut lexer = Lexer::new(source.to_string(), error_handler_ref);
+
+    let tokens = lexer.scan_tokens();
+
+    let has_error = (*error_handler).borrow().has_error();
+
+    if has_error {
+        error_handler.borrow_mut().print_errors();
+    } else {
+        for token in tokens {
+            println!("{:?}", token);
+        }
     }
 }
 
@@ -31,13 +43,17 @@ pub fn run_file(path: &String) -> Result<()> {
 pub fn run_prompt() {
     let stdin = io::stdin();
 
+    print!("> ");
+    let _ = stdout().flush();
+
     for line in stdin.lock().lines() {
-        print!("> ");
         if let Ok(line) = line {
             if line.is_empty() {
                 break;
             }
             run(line.as_str());
+            print!("> ");
+            let _ = stdout().flush();
         } else {
             break;
         }

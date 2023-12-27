@@ -1,19 +1,27 @@
 mod error;
 
-use error::ViskumError;
+pub use error::ViskumError;
 
-pub struct ErrorHandler<'a> {
-    errors: Vec<&'a str>,
+pub struct ErrorHandler {
+    errors: Vec<ViskumError>,
 }
 
-impl<'a> ErrorHandler<'a> {
-    pub fn report_error(&self, error: ViskumError) {
-        self.errors.push(error.to_string())
+impl ErrorHandler {
+    pub fn new() -> Self {
+        ErrorHandler { errors: Vec::new() }
     }
 
-    pub fn display_errors(&self) {
-        for error in self.errors {
-            eprintln!("{}", error);
+    pub fn report_error(&mut self, error: ViskumError) {
+        self.errors.push(error)
+    }
+
+    pub fn print_errors(&self) {
+        for error in &self.errors {
+            eprintln!("{}", error.to_string());
         }
+    }
+
+    pub fn has_error(&self) -> bool {
+        self.errors.len() > 0
     }
 }

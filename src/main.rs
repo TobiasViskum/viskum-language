@@ -5,6 +5,7 @@ mod lexer;
 mod token;
 mod parser;
 mod interpreter;
+mod util;
 
 use crate::print_util::print_error;
 use crate::run::{ run_file, run_prompt };

@@ -1,44 +1,32 @@
 mod token_type;
+mod literal;
 
 use std::fmt;
 
-use token_type::TokenType;
-
-//Possibly rename to "Literal"
-#[derive(Debug)]
-pub enum Object {
-    Num(f64),
-    Str(String),
-    Null,
-    True,
-    False,
-}
-
-impl fmt::Display for Object {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Object::Num(x) => write!(f, "{x}"),
-            Object::Str(str) => write!(f, "\"{x}\""),
-            Object::Null => write!(f, "null"),
-            Object::True => write!(f, "true"),
-            Object::False => write!(f, "false"),
-        }
-    }
-}
+pub use self::token_type::TokenType;
+pub use self::literal::Literal;
 
 #[derive(Debug)]
 pub struct Token {
     ttype: TokenType,
     lexeme: String,
-    literal: Option<Object>,
+    literal: Option<Literal>,
     line: usize,
 }
 
-impl Token {}
+impl Token {
+    pub fn new(ttype: TokenType, lexeme: String, literal: Option<Literal>, line: usize) -> Self {
+        Token { ttype, lexeme, literal, line }
+    }
+
+    pub fn eof(line: usize) -> Token {
+        Token::new(TokenType::Eof, "".to_string(), None, line)
+    }
+}
 
 impl fmt::Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?} {} {}", self.ttype, self.lexeme, if let Some(literal) = self.literal {
+        write!(f, "{:?} {} {}", self.ttype, self.lexeme, if let Some(literal) = &self.literal {
             literal.to_string()
         } else {
             "None".to_string()
