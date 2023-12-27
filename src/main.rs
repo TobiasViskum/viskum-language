@@ -6,8 +6,10 @@ mod token;
 mod parser;
 mod interpreter;
 mod util;
+mod expr;
 
-use crate::print_util::print_error;
+use print_util::print_error;
+
 use crate::run::{ run_file, run_prompt };
 
 use std::env::args;
