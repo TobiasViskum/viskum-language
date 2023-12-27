@@ -13,20 +13,27 @@ impl Lexer {
     }
 
     fn advance(&mut self) {
+        self.line_position += 1;
         self.current += 1;
     }
 
     fn peek(&self) -> Option<char> {
         self.source.get(self.current).copied()
     }
+
     fn peek_next(&self) -> Option<char> {
         self.source.get(self.current + 1).copied()
+    }
+
+    fn increment_line(&mut self) {
+        self.line += 1;
+        self.line_position = 0;
     }
 
     fn match_char(&mut self, expected: char) -> bool {
         match self.source.get(self.current) {
             Some(c) if *c == expected => {
-                self.current += 1;
+                self.advance();
                 true
             }
             _ => false,

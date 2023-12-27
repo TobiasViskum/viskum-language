@@ -1,3 +1,11 @@
-// this is a comment
-(( )){} // grouping stuff
-!*+-/=<> <= == // operators
+!*
+/*
+/*
+
+dskfgjn
+sgdsfgf
+
+dfg
+1+1
+
+*/

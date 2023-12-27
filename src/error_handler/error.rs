@@ -21,6 +21,13 @@ impl ViskumError {
 
         let p4 = ", ".red();
 
-        format!("{} {}{}{}", p1, vec![p2, p3].join(" "), p4, self.msg.to_string().red())
+        format!(
+            "{} {}{}{} ({})",
+            p1,
+            vec![p2, p3].join(" "),
+            p4,
+            self.msg.to_string().red(),
+            self.column
+        )
     }
 }

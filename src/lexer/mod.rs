@@ -16,6 +16,7 @@ pub struct Lexer {
     start: usize,
     current: usize,
     line: usize,
+    line_position: usize,
     error_handler: Rc<RefCell<ErrorHandler>>,
 }
 
@@ -27,6 +28,7 @@ impl Lexer {
             start: 0,
             current: 0,
             line: 1,
+            line_position: 0,
             error_handler: error_handler,
         }
     }
@@ -34,6 +36,7 @@ impl Lexer {
     pub fn scan_tokens(&mut self) -> Result<&Vec<Token>, ViskumError> {
         while !self.is_at_end() {
             self.start = self.current;
+
             self.scan_token();
         }
 
@@ -98,14 +101,14 @@ impl Lexer {
                         }
                         self.advance();
                     }
+                } else if self.match_char('*') {
+                    self.scan_comment()
                 } else {
-                    self.add_token(TokenType::Slash)
+                    self.add_token(TokenType::Slash);
                 }
             }
             ' ' | '\r' | '\t' => (),
-            '\n' => {
-                self.line += 1;
-            }
+            '\n' => self.increment_line(),
             '"' => self.string(),
             '0'..='9' => self.number(),
             _ => {
@@ -125,12 +128,75 @@ impl Lexer {
         }
     }
 
+    fn scan_comment(&mut self) {
+        loop {
+            match self.peek() {
+                Some('*') => {
+                    self.advance();
+                    if self.match_char('/') {
+                        break;
+                    }
+                }
+                Some('/') => {
+                    self.advance();
+                    if self.match_char('*') {
+                        self.scan_comment();
+                    }
+                }
+                Some('\n') => {
+                    self.advance();
+                    self.increment_line();
+                }
+                None => {
+                    self.report_error(
+                        ViskumError::new(
+                            "Expected '*/'".to_string(),
+                            self.line_position,
+                            self.line_position,
+                            "file.vs".to_string()
+                        )
+                    );
+                    break;
+                }
+                _ => self.advance(),
+            }
+        }
+
+        // let mut nesting = 1;
+        // let mut last_comment_block_start_line = self.line;
+
+        // while let Some(ch) = self.peek() {
+        //     if ch == '/' && self.match_char('*') {
+        //         nesting += 1;
+        //         last_comment_block_start_line = self.line;
+        //     } else if ch == '*' && self.match_char('/') {
+        //         nesting -= 1;
+        //     } else if ch == '\n' {
+        //         self.increment_line();
+        //     }
+
+        //     self.advance();
+
+        //     if self.is_at_end() {
+        //         break;
+        //     }
+
+        //     if nesting == 0 {
+        //         self.advance();
+        //         break;
+        //     }
+        // }
+        // println!("{}", nesting);
+        // if nesting > 0 {
+        // }
+    }
+
     fn string(&mut self) {
         while let Some(ch) = self.peek() {
             if ch == '"' {
                 break;
             } else if ch == '\n' {
-                self.line += 1;
+                self.increment_line();
             }
             self.advance();
         }
@@ -140,7 +206,7 @@ impl Lexer {
                 ViskumError::new(
                     "Unterminated string".to_string(),
                     self.line,
-                    0,
+                    self.line_position,
                     "file.vs".to_string()
                 )
             );
@@ -176,6 +242,8 @@ impl Lexer {
         while let Some(ch) = self.peek() {
             if is_alphabetic(Some(ch)) || is_digit(Some(ch)) {
                 self.advance();
+            } else {
+                break;
             }
         }
 
