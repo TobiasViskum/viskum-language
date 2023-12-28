@@ -5,11 +5,9 @@ mod lexer_util;
 mod private_methods;
 
 use crate::error_handler::ErrorHandler;
-use crate::token::{ Token, TokenType, Literal };
+use crate::token::{ Token, TokenType };
 use crate::error_handler::ViskumError;
-use crate::util::{ is_digit, is_alphabetic };
-
-use self::lexer_util::get_keyword;
+use crate::util::is_alphabetic;
 
 pub struct Lexer {
     source: Vec<char>,
@@ -127,139 +125,5 @@ impl Lexer {
                 }
             }
         }
-    }
-
-    fn scan_comment(&mut self) {
-        loop {
-            match self.peek() {
-                Some('*') => {
-                    self.advance();
-                    if self.match_char('/') {
-                        break;
-                    }
-                }
-                Some('/') => {
-                    self.advance();
-                    if self.match_char('*') {
-                        self.scan_comment();
-                    }
-                }
-                Some('\n') => {
-                    self.advance();
-                    self.increment_line();
-                }
-                None => {
-                    self.report_error(
-                        ViskumError::new(
-                            "Expected '*/'".to_string(),
-                            self.line_position,
-                            self.line_position,
-                            "file.vs".to_string()
-                        )
-                    );
-                    break;
-                }
-                _ => self.advance(),
-            }
-        }
-
-        // let mut nesting = 1;
-        // let mut last_comment_block_start_line = self.line;
-
-        // while let Some(ch) = self.peek() {
-        //     if ch == '/' && self.match_char('*') {
-        //         nesting += 1;
-        //         last_comment_block_start_line = self.line;
-        //     } else if ch == '*' && self.match_char('/') {
-        //         nesting -= 1;
-        //     } else if ch == '\n' {
-        //         self.increment_line();
-        //     }
-
-        //     self.advance();
-
-        //     if self.is_at_end() {
-        //         break;
-        //     }
-
-        //     if nesting == 0 {
-        //         self.advance();
-        //         break;
-        //     }
-        // }
-        // println!("{}", nesting);
-        // if nesting > 0 {
-        // }
-    }
-
-    fn string(&mut self) {
-        while let Some(ch) = self.peek() {
-            if ch == '"' {
-                break;
-            } else if ch == '\n' {
-                self.increment_line();
-            }
-            self.advance();
-        }
-
-        if self.is_at_end() {
-            self.report_error(
-                ViskumError::new(
-                    "Unterminated string".to_string(),
-                    self.line,
-                    self.line_position,
-                    "file.vs".to_string()
-                )
-            );
-            return;
-        }
-
-        self.advance();
-
-        let value: String = self.source[self.start + 1..self.current - 1].iter().collect();
-        self.add_token_literal(TokenType::String, Some(Literal::Str(value)))
-    }
-
-    fn number(&mut self) {
-        while is_digit(self.peek()) {
-            self.advance();
-        }
-
-        if self.peek() == Some('.') && is_digit(self.peek_next()) {
-            self.advance();
-
-            while is_digit(self.peek()) {
-                self.advance();
-            }
-        }
-
-        let value: String = self.source[self.start..self.current].iter().collect();
-        let num: f64 = value.parse().unwrap();
-
-        self.add_token_literal(TokenType::Number, Some(Literal::Num(num)))
-    }
-
-    fn identifier(&mut self) {
-        while let Some(ch) = self.peek() {
-            if is_alphabetic(Some(ch)) || is_digit(Some(ch)) {
-                self.advance();
-            } else {
-                break;
-            }
-        }
-
-        let text: String = self.source[self.start..self.current].iter().collect();
-
-        if let Some(ttype) = get_keyword(text) {
-            self.add_token(ttype);
-        } else {
-            self.add_token(TokenType::Identifier);
-        }
-
-        self.add_token(TokenType::Identifier)
-    }
-
-    fn report_error(&self, viskum_error: ViskumError) {
-        (*self.error_handler).borrow_mut().report_error(viskum_error)
     }
 }
