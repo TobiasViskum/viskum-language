@@ -2,6 +2,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 mod lexer_util;
+mod private_methods;
 
 use crate::error_handler::ErrorHandler;
 use crate::token::{ Token, TokenType, Literal };
@@ -262,6 +263,3 @@ impl Lexer {
         (*self.error_handler).borrow_mut().report_error(viskum_error)
     }
 }
-
-include!("./private_methods.rs");
-// include!("./private_char_match_methods.rs");
