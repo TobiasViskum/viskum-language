@@ -6,7 +6,7 @@ use std::fmt;
 pub use self::token_type::TokenType;
 pub use self::literal::Literal;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Token {
     pub ttype: TokenType,
     pub lexeme: String,
@@ -21,6 +21,10 @@ impl Token {
 
     pub fn eof(line: usize) -> Token {
         Token::new(TokenType::Eof, "".to_string(), None, line)
+    }
+
+    pub fn is(&self, ttype: TokenType) -> bool {
+        ttype == self.ttype
     }
 }
 

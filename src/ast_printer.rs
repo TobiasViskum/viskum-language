@@ -1,10 +1,10 @@
 use crate::expr::*;
 
-struct AstPrinter;
+pub struct AstPrinter;
 
 impl AstPrinter {
-    fn print(&self, expr: &Expr) -> String {
-        expr.accept(self)
+    pub fn print(&self, expr: &Expr) {
+        println!("{}", expr.accept(self))
     }
 
     fn parenthesize(&self, name: &String, exprs: &Vec<&Box<Expr>>) -> String {
@@ -12,6 +12,33 @@ impl AstPrinter {
         for expr in exprs {
             str_builder = format!("{str_builder} {}", expr.accept(self));
         }
+        str_builder = format!("{str_builder})");
+
+        str_builder
+    }
+
+    fn parenthesize_postfix(&self, name: &String, exprs: &Vec<&Box<Expr>>) -> String {
+        let mut str_builder = format!("{})", name);
+        for expr in exprs {
+            str_builder = format!("{} {str_builder}", expr.accept(self));
+        }
+        str_builder = format!("({str_builder}");
+
+        str_builder
+    }
+
+    fn parenthesize_ternary(
+        &self,
+        condition_expr: &Box<Expr>,
+        true_expr: &Box<Expr>,
+        false_expr: &Box<Expr>
+    ) -> String {
+        let mut str_builder = format!("(condition {}", condition_expr.accept(self));
+
+        str_builder = format!("{str_builder} (if_true {})", true_expr.accept(self));
+
+        str_builder = format!("{str_builder} (if_false {})", false_expr.accept(self));
+
         str_builder = format!("{str_builder})");
 
         str_builder
@@ -31,42 +58,15 @@ impl ExprVisitor<String> for AstPrinter {
         if let Some(v) = &expr.value { v.to_string() } else { "null".to_string() }
     }
 
-    fn visit_unary_expr(&self, expr: &UnaryExpr) -> String {
+    fn visit_prefix_expr(&self, expr: &PrefixExpr) -> String {
         self.parenthesize(&expr.operator.lexeme, &vec![&expr.right])
     }
-}
 
-mod tests {
-    use crate::{
-        expr::{ Expr, BinaryExpr, UnaryExpr, LiteralExpr, GroupingExpr },
-        token::{ TokenType, Token, Literal },
-    };
+    fn visit_postfix_expr(&self, expr: &PostfixExpr) -> String {
+        self.parenthesize_postfix(&expr.operator.lexeme, &vec![&expr.left])
+    }
 
-    use super::AstPrinter;
-
-    #[test]
-    fn check_ast_printer() {
-        let expr = Expr::Binary(BinaryExpr {
-            left: Box::from(
-                Expr::Unary(UnaryExpr {
-                    operator: Token::new(TokenType::Minus, "-".to_string(), None, 1),
-                    right: Box::from(
-                        Expr::Literal(LiteralExpr { value: Some(Literal::Num(123.0)) })
-                    ),
-                })
-            ),
-            operator: Token::new(TokenType::Star, "*".to_string(), None, 1),
-            right: Box::from(
-                Expr::Grouping(GroupingExpr {
-                    expression: Box::from(
-                        Expr::Literal(LiteralExpr { value: Some(Literal::Num(45.67)) })
-                    ),
-                })
-            ),
-        });
-
-        let ast_printer = AstPrinter;
-
-        println!("{:?}", ast_printer.print(&expr))
+    fn visit_ternary_expr(&self, expr: &TernaryExpr) -> String {
+        self.parenthesize_ternary(&expr.condition, &expr.true_expr, &expr.false_expr)
     }
 }

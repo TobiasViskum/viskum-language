@@ -1,7 +1,9 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
+use crate::ast_printer::AstPrinter;
 use crate::error_handler::ErrorHandler;
+use crate::parser::Parser;
 use crate::print_util::print_error;
 use crate::lexer::Lexer;
 
@@ -9,21 +11,26 @@ use std::io::{ self, BufRead, Result, stdout, Write };
 use std::process;
 
 fn run(source: &str) {
-    let error_handler = Rc::new(RefCell::new(ErrorHandler::new()));
+    let error_handler: Rc<RefCell<ErrorHandler>> = Rc::new(RefCell::new(ErrorHandler::new()));
 
-    let error_handler_ref = Rc::clone(&error_handler);
-
-    let mut lexer = Lexer::new(source.to_string(), error_handler_ref);
+    let mut lexer = Lexer::new(source.to_string(), &error_handler);
 
     let tokens = lexer.scan_tokens();
 
-    let has_error = (*error_handler).borrow().has_error();
+    let has_error = &error_handler.borrow().has_error();
 
-    if has_error {
+    if *has_error {
         error_handler.borrow_mut().print_errors();
     } else {
-        for token in tokens {
-            println!("{:?}", token);
+        if let Ok(tokens) = tokens {
+            let mut parser = Parser::new(tokens, &error_handler);
+
+            if let Some(expr) = parser.parse() {
+                // println!("{:?}", expr)
+                AstPrinter.print(&expr);
+            } else {
+                error_handler.borrow_mut().print_errors()
+            }
         }
     }
 }

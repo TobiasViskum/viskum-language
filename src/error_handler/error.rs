@@ -1,5 +1,6 @@
 use colorize::{ self, AnsiColor };
 
+#[derive(Debug)]
 pub struct ViskumError {
     msg: String,
     line: usize,

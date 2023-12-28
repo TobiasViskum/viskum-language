@@ -1,4 +1,4 @@
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum TokenType {
     LeftParen,
     RightParen,
@@ -10,6 +10,7 @@ pub enum TokenType {
     Plus,
     Semicolon,
     Colon,
+    QuestionMark,
     Slash,
     Star,
     Power,

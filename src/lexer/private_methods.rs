@@ -1,12 +1,12 @@
 use crate::{
     token::{ TokenType, Token, Literal },
-    util::{ is_alphabetic, is_digit },
+    util::{ is_alphabetic, is_digit, report_error },
     error_handler::ViskumError,
 };
 
 use super::{ Lexer, lexer_util::get_keyword };
 
-impl Lexer {
+impl<'a> Lexer<'a> {
     pub(super) fn add_token(&mut self, ttype: TokenType) {
         self.add_token_literal(ttype, None)
     }
@@ -70,7 +70,8 @@ impl Lexer {
                     self.increment_line();
                 }
                 None => {
-                    self.report_error(
+                    report_error(
+                        self.error_handler,
                         ViskumError::new(
                             "Expected '*/'".to_string(),
                             self.line_position,
@@ -96,7 +97,8 @@ impl Lexer {
         }
 
         if self.is_at_end() {
-            self.report_error(
+            report_error(
+                self.error_handler,
                 ViskumError::new(
                     "Unterminated string".to_string(),
                     self.line,
@@ -129,7 +131,13 @@ impl Lexer {
         let value: String = self.source[self.start..self.current].iter().collect();
         let num: f64 = value.parse().unwrap();
 
-        self.add_token_literal(TokenType::Number, Some(Literal::Num(num)))
+        self.add_token_literal(TokenType::Number, Some(Literal::Num(num)));
+
+        if self.peek() == Some('!') {
+            self.start = self.current;
+            self.advance();
+            self.add_token(TokenType::Factorial)
+        }
     }
 
     pub(super) fn identifier(&mut self) {
@@ -150,9 +158,5 @@ impl Lexer {
         }
 
         self.add_token(TokenType::Identifier)
-    }
-
-    pub(super) fn report_error(&self, viskum_error: ViskumError) {
-        (*self.error_handler).borrow_mut().report_error(viskum_error)
     }
 }

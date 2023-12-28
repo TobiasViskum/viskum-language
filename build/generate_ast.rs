@@ -15,8 +15,9 @@ pub fn generate_ast(output_dir: &String) -> io::Result<()> {
             "Binary   : left: Box<Expr>, operator: Token, right: Box<Expr>".to_string(),
             "Grouping : expression: Box<Expr>".to_string(),
             "Literal  : value: Option<Literal>".to_string(),
-            "Unary    : operator: Token, right: Box<Expr>".to_string(),
-            "UnaryOp  : left: Box<Expr>, operator: Token".to_string()
+            "Prefix   : operator: Token, right: Box<Expr>".to_string(),
+            "Postfix  : left: Box<Expr>, operator: Token".to_string(),
+            "Ternary  : condition: Box<Expr>, true_expr: Box<Expr>, false_expr: Box<Expr>".to_string()
         ]
     )?;
 
@@ -49,6 +50,7 @@ fn define_ast(output_dir: &String, base_name: &String, types: Vec<String>) -> io
         });
     }
 
+    writeln!(file, "#[derive(Debug)]")?;
     writeln!(file, "pub enum {base_name} {{")?;
     for tree_type in &tree_types {
         let base_class_name = &tree_type.base_class_name;
@@ -74,7 +76,7 @@ fn define_ast(output_dir: &String, base_name: &String, types: Vec<String>) -> io
     for tt in &tree_types {
         // let base_class_name = &tree_type.base_class_name;
         let class_name = &tt.class_name;
-
+        writeln!(file, "#[derive(Debug)]")?;
         writeln!(file, "pub struct {class_name} {{")?;
         for field in &tt.fields {
             writeln!(file, "    pub {field},")?;

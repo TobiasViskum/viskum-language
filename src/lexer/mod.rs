@@ -7,20 +7,20 @@ mod private_methods;
 use crate::error_handler::ErrorHandler;
 use crate::token::{ Token, TokenType };
 use crate::error_handler::ViskumError;
-use crate::util::is_alphabetic;
+use crate::util::{ is_alphabetic, report_error };
 
-pub struct Lexer {
+pub struct Lexer<'a> {
     source: Vec<char>,
     tokens: Vec<Token>,
     start: usize,
     current: usize,
     line: usize,
     line_position: usize,
-    error_handler: Rc<RefCell<ErrorHandler>>,
+    error_handler: &'a Rc<RefCell<ErrorHandler>>,
 }
 
-impl Lexer {
-    pub fn new(source: String, error_handler: Rc<RefCell<ErrorHandler>>) -> Self {
+impl<'a> Lexer<'a> {
+    pub fn new(source: String, error_handler: &'a Rc<RefCell<ErrorHandler>>) -> Self {
         Lexer {
             source: source.chars().collect(),
             tokens: Vec::new(),
@@ -64,6 +64,9 @@ impl Lexer {
             '+' => self.add_token(TokenType::Plus),
             ';' => self.add_token(TokenType::Semicolon),
             '*' => self.add_token(TokenType::Star),
+            '^' => self.add_token(TokenType::Power),
+            ':' => self.add_token(TokenType::Colon),
+            '?' => self.add_token(TokenType::QuestionMark),
             '!' => {
                 if self.match_char('=') {
                     self.add_token(TokenType::BangEqual)
@@ -114,7 +117,8 @@ impl Lexer {
                 if is_alphabetic(Some(c)) {
                     self.identifier();
                 } else {
-                    self.report_error(
+                    report_error(
+                        self.error_handler,
                         ViskumError::new(
                             format!("Unexpetected character: {}", c),
                             self.line,
