@@ -1,6 +1,12 @@
 use std::{ cell::RefCell, rc::Rc };
 
-use crate::{ token::{ TokenType, Token }, error_handler::ErrorHandler, expr::{ Expr, BinaryExpr } };
+mod private_methods;
+
+use crate::{
+    token::{ TokenType, Token, Literal },
+    error_handler::{ ErrorHandler, ViskumError },
+    expr::{ Expr, BinaryExpr, UnaryExpr, LiteralExpr, GroupingExpr },
+};
 
 pub struct Parser {
     tokens: Vec<Token>,
@@ -13,131 +19,134 @@ impl Parser {
         Parser { tokens: tokens, current: 0, error_handler: error_handler }
     }
 
-    fn expression(&mut self) -> Expr {
+    pub fn expression(&self) -> Result<Expr, ViskumError> {
         self.equality()
     }
 
-    fn equality(&mut self) -> Expr {
-        let mut expr = self.comparison();
+    fn equality(&self) -> Result<Expr, ViskumError> {
+        let mut expr = self.comparison()?;
 
-        while self.match_tokens(vec![TokenType::BangEqual, TokenType::EqualEqual]) {
-            if let Some(op) = self.previous() {
-                let right = self.comparison();
-                expr = Expr::Binary(BinaryExpr {
-                    left: Box::from(expr),
-                    operator: *op,
-                    right: Box::from(right),
-                });
-            } else {
-                break;
-            }
+        while self.match_tokens(&[TokenType::BangEqual, TokenType::EqualEqual])? {
+            let operator = self.previous()?;
+            let right = self.comparison()?;
+            expr = Expr::Binary(BinaryExpr {
+                left: Box::from(expr),
+                operator: *operator,
+                right: Box::from(right),
+            });
         }
-
-        expr
+        Ok(expr)
     }
 
-    fn comparison(&mut self) -> Expr {
-        let mut expr = self.term();
+    fn comparison(&self) -> Result<Expr, ViskumError> {
+        let mut expr = self.term()?;
 
         while
             self.match_tokens(
-                vec![
+                &[
                     TokenType::Greater,
                     TokenType::GreaterEqual,
                     TokenType::Less,
-                    TokenType::LessEqual
+                    TokenType::LessEqual,
                 ]
-            )
+            )?
         {
-            if let Some(op) = self.previous() {
-                let right = self.term();
-                expr = Expr::Binary(BinaryExpr {
-                    left: Box::from(expr),
-                    operator: *op,
-                    right: Box::from(right),
-                });
-            } else {
-                break;
-            }
+            let operator = self.previous()?;
+
+            let right = self.term()?;
+            expr = Expr::Binary(BinaryExpr {
+                left: Box::from(expr),
+                operator: *operator,
+                right: Box::from(right),
+            });
         }
 
-        expr
+        Ok(expr)
     }
 
-    fn term(&mut self) -> Expr {
-        let mut expr = self.factor();
+    fn term(&self) -> Result<Expr, ViskumError> {
+        let mut expr = self.factor()?;
 
-        while self.match_tokens(vec![TokenType::Minus, TokenType::Plus]) {
-            if let Some(op) = self.previous() {
-                let right = self.factor();
-                expr = Expr::Binary(BinaryExpr {
-                    left: Box::from(expr),
-                    operator: *op,
-                    right: Box::from(right),
-                });
-            } else {
-                break;
-            }
+        while self.match_tokens(&[TokenType::Minus, TokenType::Plus])? {
+            let operator = self.previous()?;
+            let right = self.factor()?;
+            expr = Expr::Binary(BinaryExpr {
+                left: Box::from(expr),
+                operator: *operator,
+                right: Box::from(right),
+            });
         }
 
-        expr
+        Ok(expr)
     }
 
-    fn factor(&mut self) -> Expr {
-        let mut expr = self.unary();
+    fn factor(&self) -> Result<Expr, ViskumError> {
+        let mut expr = self.unary()?;
 
-        while self.match_tokens(vec![TokenType::Slash, TokenType::Star]) {
-            if let Some(op) = self.previous() {
-                let right = self.unary();
-                expr = Expr::Binary(BinaryExpr {
-                    left: Box::from(expr),
-                    operator: *op,
-                    right: Box::from(right),
-                });
-            } else {
-                break;
-            }
+        while self.match_tokens(&[TokenType::Slash, TokenType::Star])? {
+            let operator = self.previous()?;
+            let right = self.unary()?;
+            expr = Expr::Binary(BinaryExpr {
+                left: Box::from(expr),
+                operator: *operator,
+                right: Box::from(right),
+            });
         }
 
-        expr
+        Ok(expr)
     }
 
-    fn unary(&mut self) -> Expr {}
+    fn unary(&self) -> Result<Expr, ViskumError> {
+        if self.match_tokens(&[TokenType::Bang, TokenType::Minus])? {
+            let operator = self.previous()?;
+            let right = self.unary()?;
+            return Ok(Expr::Unary(UnaryExpr { operator: *operator, right: Box::from(right) }));
+        }
+        // self.match_next_tokens(&[TokenType::Bang]) (unaryop)
 
-    fn match_tokens(&mut self, ttypes: Vec<TokenType>) -> bool {
-        for ttype in ttypes {
-            if self.check(ttype) {
-                self.advance();
-                return true;
-            }
+        Ok(self.primary()?)
+    }
+
+    fn primary(&mut self) -> Result<Expr, ViskumError> {
+        if self.match_tokens(&[TokenType::False])? {
+            return Ok(Expr::Literal(LiteralExpr { value: Some(Literal::False) }));
+        }
+        if self.match_tokens(&[TokenType::True])? {
+            return Ok(Expr::Literal(LiteralExpr { value: Some(Literal::True) }));
+        }
+        if self.match_tokens(&[TokenType::Null])? {
+            return Ok(Expr::Literal(LiteralExpr { value: Some(Literal::Null) }));
+        }
+        if self.match_tokens(&[TokenType::String])? {
+            return Ok(
+                Expr::Literal(LiteralExpr {
+                    value: Some(Literal::Str(self.previous()?.literal.unwrap().to_string())),
+                })
+            );
+        }
+        if self.match_tokens(&[TokenType::Number])? {
+            return Ok(
+                Expr::Literal(LiteralExpr {
+                    value: Some(
+                        Literal::Num(self.previous()?.literal.unwrap().to_string().parse().unwrap())
+                    ),
+                })
+            );
         }
 
-        false
-    }
-
-    fn check(&self, ttype: TokenType) -> bool {
-        if self.is_at_end() {
-            false
-        } else {
-            if let Some(token) = self.peek() { token.ttype == ttype } else { false }
+        if self.match_tokens(&[TokenType::LeftParen])? {
+            let expr = self.expression()?;
+            self.consume(TokenType::RightParen, "Expected ')' after expression".to_string());
+            return Ok(Expr::Grouping(GroupingExpr { expression: Box::from(expr) }));
         }
-    }
 
-    fn advance(&mut self) {
-        if !self.is_at_end() {
-            self.current += 1;
-        }
-    }
-
-    fn is_at_end(&self) -> bool {
-        if let Some(token) = self.peek() { token.ttype == TokenType::Eof } else { false }
-    }
-
-    fn peek(&self) -> Option<&Token> {
-        self.tokens.get(self.current)
-    }
-
-    fn previous(&self) -> Option<&Token> {
-        self.tokens.get(self.current - 1)
+        Err(
+            ViskumError::new(
+                "Failed primary parsing".to_string(),
+                self.peek()?.line,
+                0,
+                "file.vs".to_string()
+            )
+        )
     }
 }
