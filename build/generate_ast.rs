@@ -8,24 +8,24 @@ struct TreeType {
 }
 
 pub fn generate_ast(output_dir: &String) -> io::Result<()> {
-    // define_ast(
-    //     output_dir,
-    //     &"Expr".to_string(),
-    //     vec![
-    //         "Binary   : left: Box<Expr>, operator: Token, right: Box<Expr>",
-    //         "Grouping : expression: Box<Expr>",
-    //         "Literal  : value: Option<Literal>",
-    //         "Prefix   : operator: Token, right: Box<Expr>",
-    //         "Postfix  : left: Box<Expr>, operator: Token",
-    //         "Ternary  : condition: Box<Expr>, true_expr: Box<Expr>, false_expr: Box<Expr>"
-    //     ]
-    // )?;
+    define_ast(
+        output_dir,
+        &"Expr".to_string(),
+        vec![
+            "Binary   : left: Box<Expr>, operator: Token, right: Box<Expr>",
+            "Grouping : expression: Box<Expr>",
+            "Literal  : value: Option<Literal>",
+            "Prefix   : operator: Token, right: Box<Expr>",
+            "Postfix  : left: Box<Expr>, operator: Token",
+            "Ternary  : condition: Box<Expr>, true_expr: Box<Expr>, false_expr: Box<Expr>"
+        ]
+    )?;
 
-    // define_ast(
-    //     output_dir,
-    //     &"Stmt".to_string(),
-    //     vec!["Expression : expression: Box<Expr>", "Print      : expression: Box<Expr>"]
-    // )?;
+    define_ast(
+        output_dir,
+        &"Stmt".to_string(),
+        vec!["Expression : expression: Box<Expr>", "Print      : expression: Box<Expr>"]
+    )?;
 
     Ok(())
 }
