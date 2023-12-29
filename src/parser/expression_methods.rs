@@ -129,15 +129,12 @@ impl<'a> Parser<'a> {
 
     pub(super) fn primary(&mut self) -> Result<Expr, ViskumError> {
         if self.match_tokens(&[TokenType::False])? {
-            self.advance()?;
             return Ok(Expr::Literal(LiteralExpr { value: Some(Literal::Bool(false)) }));
         }
         if self.match_tokens(&[TokenType::True])? {
-            self.advance()?;
             return Ok(Expr::Literal(LiteralExpr { value: Some(Literal::Bool(true)) }));
         }
         if self.match_tokens(&[TokenType::Null])? {
-            self.advance()?;
             return Ok(Expr::Literal(LiteralExpr { value: Some(Literal::Null) }));
         }
         if self.match_tokens(&[TokenType::String])? {

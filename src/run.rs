@@ -21,18 +21,22 @@ fn run(source: &str) {
     if let Ok(tokens) = tokens {
         let mut parser = Parser::new(tokens, &error_handler);
 
-        if let Some(expr) = parser.parse() {
-            let has_error = &error_handler.borrow().has_error();
+        match parser.parse() {
+            Ok(stmts) => {
+                let has_error = &error_handler.borrow().has_error();
 
-            if !*has_error {
-                let interpreter = Interpreter::new(&error_handler);
-                let _ = interpreter.interpret(&expr);
-                // AstPrinter.print(&expr);
-            } else {
+                if !*has_error {
+                    let interpreter = Interpreter::new(&error_handler);
+                    let _ = interpreter.interpret(stmts);
+                    // AstPrinter.print(&expr);
+                } else {
+                    error_handler.borrow_mut().print_errors();
+                }
+            }
+            Err(e) => {
+                error_handler.borrow_mut().report_error(e);
                 error_handler.borrow_mut().print_errors();
             }
-        } else {
-            error_handler.borrow_mut().print_errors()
         }
     }
 }

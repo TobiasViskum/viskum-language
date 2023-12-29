@@ -7,6 +7,7 @@ mod parser;
 mod interpreter;
 mod util;
 mod expr;
+mod stmt;
 mod ast_printer;
 
 use print_util::print_error;

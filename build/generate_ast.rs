@@ -25,7 +25,7 @@ pub fn generate_ast(output_dir: &String) -> io::Result<()> {
     define_ast(
         output_dir,
         &"Stmt".to_string(),
-        vec!["error_handler::ViskumError", "token::Token", "token::Literal", "expr::Expr"],
+        vec!["error_handler::ViskumError", "expr::Expr"],
         vec!["Expression : expression: Box<Expr>", "Print      : expression: Box<Expr>"]
     )?;
 

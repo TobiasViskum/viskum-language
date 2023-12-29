@@ -1,4 +1,7 @@
-1+1
+print 1 + 1;
+print 1 + 2;
+print true;
+
 
 /*
 if 1 + 1 == 2 ? "this is cool or" : "not"
