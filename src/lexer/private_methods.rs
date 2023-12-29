@@ -151,7 +151,5 @@ impl<'a> Lexer<'a> {
         } else {
             self.add_token(TokenType::Identifier);
         }
-
-        self.add_token(TokenType::Identifier)
     }
 }
