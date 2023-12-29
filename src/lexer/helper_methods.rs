@@ -4,7 +4,7 @@ use crate::{
     error_handler::ViskumError,
 };
 
-use super::{ Lexer, lexer_util::get_keyword };
+use super::{ Lexer, get_keyword::get_keyword };
 
 impl<'a> Lexer<'a> {
     pub(super) fn add_token(&mut self, ttype: TokenType) {

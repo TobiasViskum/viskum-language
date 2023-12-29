@@ -1,6 +1,6 @@
 use std::{ cell::RefCell, rc::Rc };
 
-mod private_methods;
+mod helper_methods;
 mod expression_methods;
 mod statements;
 
@@ -27,13 +27,27 @@ impl<'a> Parser<'a> {
         let mut statements: Vec<Stmt> = Vec::new();
 
         while !self.is_at_end()? {
-            statements.push(self.statement()?);
+            statements.push(self.declaration()?);
         }
 
         Ok(statements)
     }
 
     //main method
+    fn declaration(&mut self) -> Result<Stmt, ViskumError> {
+        let result = if self.match_tokens(&[TokenType::Let])? {
+            self.variable_declaration()
+        } else {
+            self.statement()
+        };
+
+        if result.is_err() {
+            self.synchronize();
+        }
+
+        result
+    }
+
     fn statement(&mut self) -> Result<Stmt, ViskumError> {
         if self.match_tokens(&[TokenType::Print])? {
             self.print_statement()

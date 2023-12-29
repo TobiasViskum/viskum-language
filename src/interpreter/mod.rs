@@ -1,19 +1,30 @@
 mod expr_visitor;
 mod stmt_visitor;
+mod helper_methods;
 
 use std::{ rc::Rc, cell::RefCell };
 
-use crate::{ expr::*, token::Literal, error_handler::{ ErrorHandler, ViskumError }, stmt::Stmt };
+use crate::{
+    expr::*,
+    token::Literal,
+    error_handler::{ ErrorHandler, ViskumError },
+    stmt::Stmt,
+    environment::Environment,
+};
 
 pub struct Interpreter<'a> {
     error_handler: &'a Rc<RefCell<ErrorHandler>>,
+    environment: &'a Rc<RefCell<Environment>>,
 }
 
 type Output = Literal;
 
 impl<'a> Interpreter<'a> {
-    pub fn new(error_handler: &'a Rc<RefCell<ErrorHandler>>) -> Self {
-        Interpreter { error_handler: error_handler }
+    pub fn new(
+        error_handler: &'a Rc<RefCell<ErrorHandler>>,
+        environment: &'a Rc<RefCell<Environment>>
+    ) -> Self {
+        Interpreter { error_handler: error_handler, environment: environment }
     }
 
     pub fn interpret(&self, statements: Vec<Stmt>) {

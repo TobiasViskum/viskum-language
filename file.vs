@@ -1,7 +1,11 @@
-print 1 + 1;
-print 1 + 2;
-print true;
+let a = (1 + 1) * 2;
+let b = 4;
+let c = 2;
 
+d = 22;
+print a;
+a = 2;
+print d;
 
 /*
 if 1 + 1 == 2 ? "this is cool or" : "not"

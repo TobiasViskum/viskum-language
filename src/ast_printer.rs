@@ -79,4 +79,10 @@ impl ExprVisitor<Output> for AstPrinter {
     fn visit_ternary_expr(&self, expr: &TernaryExpr) -> Result<Output, ViskumError> {
         self.parenthesize_ternary(&expr.condition, &expr.true_expr, &expr.false_expr)
     }
+    fn visit_variable_expr(&self, expr: &VariableExpr) -> Result<Output, ViskumError> {
+        todo!()
+    }
+    fn visit_assign_expr(&self, expr: &AssignExpr) -> Result<Output, ViskumError> {
+        todo!()
+    }
 }

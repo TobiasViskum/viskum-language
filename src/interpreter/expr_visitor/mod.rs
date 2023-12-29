@@ -1,6 +1,12 @@
 mod binary_operations;
 
-use crate::{ expr::*, token::{ Literal, TokenType }, error_handler::ViskumError, util::factorial };
+use crate::{
+    expr::*,
+    token::{ Literal, TokenType },
+    error_handler::ViskumError,
+    util::factorial,
+    environment::environment_value::EnvironmentValue,
+};
 
 use super::Interpreter;
 
@@ -128,5 +134,18 @@ impl<'a> ExprVisitor<Output> for Interpreter<'a> {
         } else {
             Ok(self.evaluate(&expr.false_expr)?)
         }
+    }
+
+    fn visit_variable_expr(&self, expr: &VariableExpr) -> Result<Output, ViskumError> {
+        Ok(self.environment_get(&expr.token)?)
+    }
+
+    fn visit_assign_expr(&self, expr: &AssignExpr) -> Result<Output, ViskumError> {
+        Ok(
+            self.environment_assign(
+                &expr.token,
+                EnvironmentValue::new(self.evaluate(&expr.value)?, false)
+            )?
+        )
     }
 }

@@ -1,17 +1,67 @@
 use crate::{
-    expr::{ Expr, BinaryExpr, PrefixExpr, LiteralExpr, GroupingExpr, PostfixExpr, TernaryExpr },
+    expr::{
+        Expr,
+        BinaryExpr,
+        PrefixExpr,
+        LiteralExpr,
+        GroupingExpr,
+        PostfixExpr,
+        TernaryExpr,
+        VariableExpr,
+        AssignExpr,
+    },
     error_handler::ViskumError,
     token::{ TokenType, Literal },
+    stmt::{ Stmt, LetStmt },
+    util::report_error,
 };
 
 use super::Parser;
 
 impl<'a> Parser<'a> {
-    pub(super) fn expression(&mut self) -> Result<Expr, ViskumError> {
-        self.ternary()
+    pub(super) fn variable_declaration(&mut self) -> Result<Stmt, ViskumError> {
+        let token = self.consume_and_get(TokenType::Identifier, "Expected variable name")?;
+
+        let initializer = if self.match_tokens(&[TokenType::Equal])? {
+            self.expression()?
+        } else {
+            Expr::Literal(LiteralExpr { value: Some(Literal::Null) })
+        };
+
+        self.consume(TokenType::Semicolon, "Expected ';' after variable declaration")?;
+
+        Ok(Stmt::Let(LetStmt { token: token, initializer: Box::from(initializer) }))
     }
 
-    pub(super) fn ternary(&mut self) -> Result<Expr, ViskumError> {
+    pub(super) fn expression(&mut self) -> Result<Expr, ViskumError> {
+        self.assignment()
+    }
+
+    fn assignment(&mut self) -> Result<Expr, ViskumError> {
+        let expr = self.ternary()?;
+
+        if self.match_tokens(&[TokenType::Equal])? {
+            let equals = self.peek_previous()?;
+            let value = self.assignment()?;
+
+            if let Expr::Variable(expr) = expr {
+                return Ok(Expr::Assign(AssignExpr { token: expr.token, value: Box::from(value) }));
+            } else {
+                report_error(
+                    self.error_handler,
+                    ViskumError::new(
+                        format!("Invalid assignment target '{}'", "unkown").as_str(),
+                        equals,
+                        "file.vs"
+                    )
+                );
+            }
+        }
+
+        Ok(expr)
+    }
+
+    fn ternary(&mut self) -> Result<Expr, ViskumError> {
         let condition_expr = self.equality()?;
 
         if self.match_tokens(&[TokenType::QuestionMark])? {
@@ -33,7 +83,7 @@ impl<'a> Parser<'a> {
         Ok(condition_expr)
     }
 
-    pub(super) fn equality(&mut self) -> Result<Expr, ViskumError> {
+    fn equality(&mut self) -> Result<Expr, ViskumError> {
         let mut expr = self.comparison()?;
 
         while self.match_tokens(&[TokenType::BangEqual, TokenType::EqualEqual])? {
@@ -48,7 +98,7 @@ impl<'a> Parser<'a> {
         Ok(expr)
     }
 
-    pub(super) fn comparison(&mut self) -> Result<Expr, ViskumError> {
+    fn comparison(&mut self) -> Result<Expr, ViskumError> {
         let mut expr = self.term()?;
 
         while
@@ -74,7 +124,7 @@ impl<'a> Parser<'a> {
         Ok(expr)
     }
 
-    pub(super) fn term(&mut self) -> Result<Expr, ViskumError> {
+    fn term(&mut self) -> Result<Expr, ViskumError> {
         let mut expr = self.factor()?;
 
         while self.match_tokens(&[TokenType::Minus, TokenType::Plus])? {
@@ -90,7 +140,7 @@ impl<'a> Parser<'a> {
         Ok(expr)
     }
 
-    pub(super) fn factor(&mut self) -> Result<Expr, ViskumError> {
+    fn factor(&mut self) -> Result<Expr, ViskumError> {
         let mut expr = self.unary()?;
 
         while self.match_tokens(&[TokenType::Slash, TokenType::Star, TokenType::Power])? {
@@ -106,7 +156,7 @@ impl<'a> Parser<'a> {
         Ok(expr)
     }
 
-    pub(super) fn unary(&mut self) -> Result<Expr, ViskumError> {
+    fn unary(&mut self) -> Result<Expr, ViskumError> {
         // Postfix e.g. 5!
         if self.match_next_tokens(&[TokenType::Factorial])? {
             let operator = self.peek_next()?;
@@ -127,7 +177,7 @@ impl<'a> Parser<'a> {
         Ok(self.primary()?)
     }
 
-    pub(super) fn primary(&mut self) -> Result<Expr, ViskumError> {
+    fn primary(&mut self) -> Result<Expr, ViskumError> {
         if self.match_tokens(&[TokenType::False])? {
             return Ok(Expr::Literal(LiteralExpr { value: Some(Literal::Bool(false)) }));
         }
@@ -137,23 +187,17 @@ impl<'a> Parser<'a> {
         if self.match_tokens(&[TokenType::Null])? {
             return Ok(Expr::Literal(LiteralExpr { value: Some(Literal::Null) }));
         }
-        if self.match_tokens(&[TokenType::String])? {
+
+        if self.match_tokens(&[TokenType::Number, TokenType::String])? {
             return Ok(
                 Expr::Literal(LiteralExpr {
-                    value: Some(Literal::Str(self.peek_previous()?.literal.unwrap().to_string())),
+                    value: self.peek_previous()?.literal.clone(),
                 })
             );
         }
-        if self.match_tokens(&[TokenType::Number])? {
-            return Ok(
-                Expr::Literal(LiteralExpr {
-                    value: Some(
-                        Literal::Num(
-                            self.peek_previous()?.literal.unwrap().to_string().parse().unwrap()
-                        )
-                    ),
-                })
-            );
+
+        if self.match_tokens(&[TokenType::Identifier])? {
+            return Ok(Expr::Variable(VariableExpr { token: self.peek_previous()? }));
         }
 
         if self.match_tokens(&[TokenType::LeftParen])? {

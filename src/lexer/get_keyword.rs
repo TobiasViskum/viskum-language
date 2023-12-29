@@ -15,6 +15,7 @@ pub fn get_keyword(check: String) -> Option<TokenType> {
         "this" => Some(TokenType::This),
         "true" => Some(TokenType::True),
         "let" => Some(TokenType::Let),
+        "mut" => Some(TokenType::Mut),
         "while" => Some(TokenType::While),
         "new" => Some(TokenType::New),
         _ => None,

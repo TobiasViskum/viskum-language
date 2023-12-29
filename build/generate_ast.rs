@@ -18,15 +18,21 @@ pub fn generate_ast(output_dir: &String) -> io::Result<()> {
             "Literal  : value: Option<Literal>",
             "Prefix   : operator: Token, right: Box<Expr>",
             "Postfix  : left: Box<Expr>, operator: Token",
-            "Ternary  : condition: Box<Expr>, true_expr: Box<Expr>, false_expr: Box<Expr>"
+            "Ternary  : condition: Box<Expr>, true_expr: Box<Expr>, false_expr: Box<Expr>",
+            "Variable : token: Token",
+            "Assign   : token: Token, value: Box<Expr>"
         ]
     )?;
 
     define_ast(
         output_dir,
         &"Stmt".to_string(),
-        vec!["error_handler::ViskumError", "expr::Expr"],
-        vec!["Expression : expression: Box<Expr>", "Print      : expression: Box<Expr>"]
+        vec!["error_handler::ViskumError", "token::Token", "expr::Expr"],
+        vec![
+            "Expression : expression: Box<Expr>",
+            "Print      : expression: Box<Expr>",
+            "Let        : token: Token, initializer: Box<Expr>"
+        ]
     )?;
 
     Ok(())

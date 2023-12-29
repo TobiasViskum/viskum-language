@@ -3,6 +3,21 @@ use crate::{ token::{ TokenType, Token }, error_handler::ViskumError };
 pub use super::Parser;
 
 impl<'a> Parser<'a> {
+    pub(super) fn consume_and_get(
+        &mut self,
+        ttype: TokenType,
+        msg: &str
+    ) -> Result<Token, ViskumError> {
+        if self.check(&ttype)? {
+            let token = self.peek()?;
+            self.advance()?;
+            Ok(token)
+        } else {
+            let token = self.peek()?;
+            Err(ViskumError::new(msg, token, "file.vs"))
+        }
+    }
+
     pub(super) fn consume(&mut self, ttype: TokenType, msg: &str) -> Result<(), ViskumError> {
         if self.check(&ttype)? {
             Ok(self.advance()?)

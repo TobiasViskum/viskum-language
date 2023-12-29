@@ -43,6 +43,7 @@ pub enum TokenType {
     This,
     True,
     Let,
+    Mut,
     While,
 
     Eof,
@@ -108,6 +109,7 @@ impl TokenType {
             Self::This => "this",
             Self::True => "true",
             Self::Let => "let",
+            Self::Mut => "mut",
             Self::While => "while",
 
             Self::Eof => "end of file",

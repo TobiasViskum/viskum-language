@@ -1,8 +1,8 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-mod lexer_util;
-mod private_methods;
+mod get_keyword;
+mod helper_methods;
 
 use crate::error_handler::ErrorHandler;
 use crate::token::{ Token, TokenType };
