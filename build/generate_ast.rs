@@ -12,25 +12,25 @@ pub fn generate_ast(output_dir: &String) -> io::Result<()> {
         output_dir,
         &"Expr".to_string(),
         vec![
-            "Binary   : left: Box<Expr>, operator: Token, right: Box<Expr>".to_string(),
-            "Grouping : expression: Box<Expr>".to_string(),
-            "Literal  : value: Option<Literal>".to_string(),
-            "Prefix   : operator: Token, right: Box<Expr>".to_string(),
-            "Postfix  : left: Box<Expr>, operator: Token".to_string(),
-            "Ternary  : condition: Box<Expr>, true_expr: Box<Expr>, false_expr: Box<Expr>".to_string()
+            "Binary   : left: Box<Expr>, operator: Token, right: Box<Expr>",
+            "Grouping : expression: Box<Expr>",
+            "Literal  : value: Option<Literal>",
+            "Prefix   : operator: Token, right: Box<Expr>",
+            "Postfix  : left: Box<Expr>, operator: Token",
+            "Ternary  : condition: Box<Expr>, true_expr: Box<Expr>, false_expr: Box<Expr>"
         ]
     )?;
 
     Ok(())
 }
 
-fn define_ast(output_dir: &String, base_name: &String, types: Vec<String>) -> io::Result<()> {
+fn define_ast(output_dir: &String, base_name: &String, types: Vec<&str>) -> io::Result<()> {
     let path = format!("{}/{}.rs", output_dir, base_name.to_lowercase());
     let mut file = File::create(path)?;
     let mut tree_types: Vec<TreeType> = Vec::new();
-    let return_type = &"String".to_string();
+    let return_type = "Result<T, ViskumError>";
 
-    // writeln!(file, "use crate::error_handler::ViskumError;")?;
+    writeln!(file, "use crate::error_handler::ViskumError;")?;
     writeln!(file, "use crate::token::Token;")?;
     writeln!(file, "use crate::token::Literal;\n")?;
 

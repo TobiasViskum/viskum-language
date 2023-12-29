@@ -55,7 +55,14 @@ impl<'a> Lexer<'a> {
 
         match c {
             '(' => self.add_token(TokenType::LeftParen),
-            ')' => self.add_token(TokenType::RightParen),
+            ')' => {
+                self.add_token(TokenType::RightParen);
+                if self.peek() == Some('!') {
+                    self.start = self.current;
+                    self.advance();
+                    self.add_token(TokenType::Factorial)
+                }
+            }
             '{' => self.add_token(TokenType::LeftBrace),
             '}' => self.add_token(TokenType::RightBrace),
             ',' => self.add_token(TokenType::Comma),
@@ -120,10 +127,9 @@ impl<'a> Lexer<'a> {
                     report_error(
                         self.error_handler,
                         ViskumError::new(
-                            format!("Unexpetected character: {}", c),
-                            self.line,
-                            self.start,
-                            "file.vs".to_string()
+                            format!("Unrecognizable character: {}", c).as_str(),
+                            Token::invalid(Some(self.line)),
+                            "file.vs"
                         )
                     )
                 }

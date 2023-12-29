@@ -1,16 +1,17 @@
 use colorize::{ self, AnsiColor };
 
+use crate::token::Token;
+
 #[derive(Debug)]
 pub struct ViskumError {
     msg: String,
-    line: usize,
-    column: usize,
+    token: Token,
     file: String,
 }
 
 impl ViskumError {
-    pub fn new(msg: String, line: usize, column: usize, file: String) -> Self {
-        ViskumError { msg, line, column, file }
+    pub fn new(msg: &str, token: Token, file: &str) -> Self {
+        ViskumError { msg: msg.to_string(), token, file: file.to_string() }
     }
 
     pub fn to_string(&self) -> String {
@@ -18,17 +19,10 @@ impl ViskumError {
 
         let p2 = vec![self.file.to_string(), ":".to_string()].join("").red();
 
-        let p3 = vec!["line".to_string(), self.line.to_string()].join(" ").red();
+        let p3 = vec!["line".to_string(), self.token.line.to_string()].join(" ").red();
 
         let p4 = ", ".red();
 
-        format!(
-            "{} {}{}{} ({})",
-            p1,
-            vec![p2, p3].join(" "),
-            p4,
-            self.msg.to_string().red(),
-            self.column
-        )
+        format!("{} {}{}{} ({})", p1, vec![p2, p3].join(" "), p4, self.msg.to_string().red(), 0)
     }
 }

@@ -3,12 +3,12 @@ use crate::{ token::{ TokenType, Token }, error_handler::ViskumError };
 pub use super::Parser;
 
 impl<'a> Parser<'a> {
-    pub(super) fn consume(&mut self, ttype: TokenType, msg: String) -> Result<(), ViskumError> {
+    pub(super) fn consume(&mut self, ttype: TokenType, msg: &str) -> Result<(), ViskumError> {
         if self.check(&ttype)? {
             Ok(self.advance()?)
         } else {
             let token = self.peek()?;
-            Err(ViskumError::new(msg, token.line, 0, "file.vs".to_string()))
+            Err(ViskumError::new(msg, token, "file.vs"))
         }
     }
 
@@ -52,16 +52,15 @@ impl<'a> Parser<'a> {
         Ok(self.peek()?.is(TokenType::Eof))
     }
 
-    pub(super) fn peek(&self) -> Result<&Token, ViskumError> {
+    pub(super) fn peek(&self) -> Result<Token, ViskumError> {
         match self.tokens.get(self.current) {
-            Some(token) => Ok(token),
+            Some(token) => Ok(token.clone()),
             None =>
                 Err(
                     ViskumError::new(
-                        "Internal error: Failed to find token".to_string(),
-                        0,
-                        0,
-                        "file.vs".to_string()
+                        "Internal error: Failed to find token",
+                        Token::invalid(None),
+                        "file.vs"
                     )
                 ),
         }
@@ -73,10 +72,9 @@ impl<'a> Parser<'a> {
             None =>
                 Err(
                     ViskumError::new(
-                        "Internal error: Failed to find token".to_string(),
-                        0,
-                        0,
-                        "file.vs".to_string()
+                        "Internal error: Failed to find token",
+                        Token::invalid(None),
+                        "file.vs"
                     )
                 ),
         }
@@ -88,10 +86,9 @@ impl<'a> Parser<'a> {
             None =>
                 Err(
                     ViskumError::new(
-                        "Internal error: Failed to find token".to_string(),
-                        0,
-                        0,
-                        "file.vs".to_string()
+                        "Internal error: Failed to find token",
+                        Token::invalid(None),
+                        "file.vs"
                     )
                 ),
         }

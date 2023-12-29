@@ -1,8 +1,9 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use crate::ast_printer::AstPrinter;
+// use crate::ast_printer::AstPrinter;
 use crate::error_handler::ErrorHandler;
+use crate::interpreter::Interpreter;
 use crate::parser::Parser;
 use crate::print_util::print_error;
 use crate::lexer::Lexer;
@@ -17,20 +18,21 @@ fn run(source: &str) {
 
     let tokens = lexer.scan_tokens();
 
-    let has_error = &error_handler.borrow().has_error();
+    if let Ok(tokens) = tokens {
+        let mut parser = Parser::new(tokens, &error_handler);
 
-    if *has_error {
-        error_handler.borrow_mut().print_errors();
-    } else {
-        if let Ok(tokens) = tokens {
-            let mut parser = Parser::new(tokens, &error_handler);
+        if let Some(expr) = parser.parse() {
+            let has_error = &error_handler.borrow().has_error();
 
-            if let Some(expr) = parser.parse() {
-                // println!("{:?}", expr)
-                AstPrinter.print(&expr);
+            if !*has_error {
+                let interpreter = Interpreter::new(&error_handler);
+                let _ = interpreter.interpret(&expr);
+                // AstPrinter.print(&expr);
             } else {
-                error_handler.borrow_mut().print_errors()
+                error_handler.borrow_mut().print_errors();
             }
+        } else {
+            error_handler.borrow_mut().print_errors()
         }
     }
 }

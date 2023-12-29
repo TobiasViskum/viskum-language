@@ -73,10 +73,9 @@ impl<'a> Lexer<'a> {
                     report_error(
                         self.error_handler,
                         ViskumError::new(
-                            "Expected '*/'".to_string(),
-                            self.line_position,
-                            self.line_position,
-                            "file.vs".to_string()
+                            "Expected '*/'",
+                            Token::invalid(Some(self.line)),
+                            "file.vs"
                         )
                     );
                     break;
@@ -99,12 +98,7 @@ impl<'a> Lexer<'a> {
         if self.is_at_end() {
             report_error(
                 self.error_handler,
-                ViskumError::new(
-                    "Unterminated string".to_string(),
-                    self.line,
-                    self.line_position,
-                    "file.vs".to_string()
-                )
+                ViskumError::new("Unterminated string", Token::invalid(Some(self.line)), "file.vs")
             );
             return;
         }
@@ -112,6 +106,7 @@ impl<'a> Lexer<'a> {
         self.advance();
 
         let value: String = self.source[self.start + 1..self.current - 1].iter().collect();
+
         self.add_token_literal(TokenType::String, Some(Literal::Str(value)))
     }
 

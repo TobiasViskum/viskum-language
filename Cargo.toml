@@ -8,3 +8,4 @@ build = "build/build.rs"
 
 [dependencies]
 colorize = "0.1.0"
+statrs = "0.16.0"

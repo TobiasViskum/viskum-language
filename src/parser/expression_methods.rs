@@ -17,7 +17,7 @@ impl<'a> Parser<'a> {
         if self.match_tokens(&[TokenType::QuestionMark])? {
             let true_expr = self.equality()?;
 
-            self.consume(TokenType::Colon, "Expected ':' in ternary expression".to_string())?;
+            self.consume(TokenType::Colon, "Expected ':' in ternary expression")?;
 
             let false_expr = self.equality()?;
 
@@ -91,11 +91,11 @@ impl<'a> Parser<'a> {
     }
 
     pub(super) fn factor(&mut self) -> Result<Expr, ViskumError> {
-        let mut expr = self.post_pre_fix()?;
+        let mut expr = self.unary()?;
 
         while self.match_tokens(&[TokenType::Slash, TokenType::Star, TokenType::Power])? {
             let operator = self.peek_previous()?;
-            let right = self.post_pre_fix()?;
+            let right = self.unary()?;
             expr = Expr::Binary(BinaryExpr {
                 left: Box::from(expr),
                 operator: operator,
@@ -106,7 +106,7 @@ impl<'a> Parser<'a> {
         Ok(expr)
     }
 
-    pub(super) fn post_pre_fix(&mut self) -> Result<Expr, ViskumError> {
+    pub(super) fn unary(&mut self) -> Result<Expr, ViskumError> {
         // Postfix e.g. 5!
         if self.match_next_tokens(&[TokenType::Factorial])? {
             let operator = self.peek_next()?;
@@ -120,7 +120,7 @@ impl<'a> Parser<'a> {
         // Prefix e.g. !5
         if self.match_tokens(&[TokenType::Bang, TokenType::Minus])? {
             let operator = self.peek_previous()?;
-            let right = self.post_pre_fix()?;
+            let right = self.unary()?;
             return Ok(Expr::Prefix(PrefixExpr { operator: operator, right: Box::from(right) }));
         }
 
@@ -129,12 +129,15 @@ impl<'a> Parser<'a> {
 
     pub(super) fn primary(&mut self) -> Result<Expr, ViskumError> {
         if self.match_tokens(&[TokenType::False])? {
-            return Ok(Expr::Literal(LiteralExpr { value: Some(Literal::False) }));
+            self.advance()?;
+            return Ok(Expr::Literal(LiteralExpr { value: Some(Literal::Bool(false)) }));
         }
         if self.match_tokens(&[TokenType::True])? {
-            return Ok(Expr::Literal(LiteralExpr { value: Some(Literal::True) }));
+            self.advance()?;
+            return Ok(Expr::Literal(LiteralExpr { value: Some(Literal::Bool(true)) }));
         }
         if self.match_tokens(&[TokenType::Null])? {
+            self.advance()?;
             return Ok(Expr::Literal(LiteralExpr { value: Some(Literal::Null) }));
         }
         if self.match_tokens(&[TokenType::String])? {
@@ -158,21 +161,24 @@ impl<'a> Parser<'a> {
 
         if self.match_tokens(&[TokenType::LeftParen])? {
             let expr = self.expression()?;
-            let _ = self.consume(
-                TokenType::RightParen,
-                "Expected ')' after expression".to_string()
-            )?;
+            let _ = self.consume(TokenType::RightParen, "Expected ')' after expression")?;
+
+            if self.match_tokens(&[TokenType::Factorial])? {
+                let operator = self.peek_previous()?;
+
+                return Ok(
+                    Expr::Postfix(PostfixExpr {
+                        left: Box::from(
+                            Expr::Grouping(GroupingExpr { expression: Box::from(expr) })
+                        ),
+                        operator: operator,
+                    })
+                );
+            }
 
             return Ok(Expr::Grouping(GroupingExpr { expression: Box::from(expr) }));
         }
 
-        Err(
-            ViskumError::new(
-                "Expected expression".to_string(),
-                self.peek()?.line,
-                0,
-                "file.vs".to_string()
-            )
-        )
+        Err(ViskumError::new("Expected expression", self.peek()?, "file.vs"))
     }
 }

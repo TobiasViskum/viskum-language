@@ -1,3 +1,4 @@
+use crate::error_handler::ViskumError;
 use crate::token::Token;
 use crate::token::Literal;
 
@@ -11,7 +12,7 @@ pub enum Expr {
     Ternary(TernaryExpr),
 }
 impl Expr {
-    pub fn accept<T>(&self, expr_visitor: &dyn ExprVisitor<T>) -> String {
+    pub fn accept<T>(&self, expr_visitor: &dyn ExprVisitor<T>) -> Result<T, ViskumError> {
         match self {
             Expr::Binary(expr) => expr.accept(expr_visitor),
             Expr::Grouping(expr) => expr.accept(expr_visitor),
@@ -53,46 +54,46 @@ pub struct TernaryExpr {
     pub false_expr: Box<Expr>,
 }
 pub trait ExprVisitor<T> {
-    fn visit_binary_expr(&self, expr: &BinaryExpr) -> String;
-    fn visit_grouping_expr(&self, expr: &GroupingExpr) -> String;
-    fn visit_literal_expr(&self, expr: &LiteralExpr) -> String;
-    fn visit_prefix_expr(&self, expr: &PrefixExpr) -> String;
-    fn visit_postfix_expr(&self, expr: &PostfixExpr) -> String;
-    fn visit_ternary_expr(&self, expr: &TernaryExpr) -> String;
+    fn visit_binary_expr(&self, expr: &BinaryExpr) -> Result<T, ViskumError>;
+    fn visit_grouping_expr(&self, expr: &GroupingExpr) -> Result<T, ViskumError>;
+    fn visit_literal_expr(&self, expr: &LiteralExpr) -> Result<T, ViskumError>;
+    fn visit_prefix_expr(&self, expr: &PrefixExpr) -> Result<T, ViskumError>;
+    fn visit_postfix_expr(&self, expr: &PostfixExpr) -> Result<T, ViskumError>;
+    fn visit_ternary_expr(&self, expr: &TernaryExpr) -> Result<T, ViskumError>;
 }
 
 impl BinaryExpr {
-    pub fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> String {
+    pub fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> Result<T, ViskumError> {
         visitor.visit_binary_expr(self)
     }
 }
 
 impl GroupingExpr {
-    pub fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> String {
+    pub fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> Result<T, ViskumError> {
         visitor.visit_grouping_expr(self)
     }
 }
 
 impl LiteralExpr {
-    pub fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> String {
+    pub fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> Result<T, ViskumError> {
         visitor.visit_literal_expr(self)
     }
 }
 
 impl PrefixExpr {
-    pub fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> String {
+    pub fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> Result<T, ViskumError> {
         visitor.visit_prefix_expr(self)
     }
 }
 
 impl PostfixExpr {
-    pub fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> String {
+    pub fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> Result<T, ViskumError> {
         visitor.visit_postfix_expr(self)
     }
 }
 
 impl TernaryExpr {
-    pub fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> String {
+    pub fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> Result<T, ViskumError> {
         visitor.visit_ternary_expr(self)
     }
 }

@@ -19,6 +19,14 @@ impl Token {
         Token { ttype, lexeme, literal, line }
     }
 
+    pub fn invalid(line: Option<usize>) -> Token {
+        Token::new(TokenType::Invalid, "".to_string(), None, if let Some(line) = line {
+            line
+        } else {
+            0
+        })
+    }
+
     pub fn eof(line: usize) -> Token {
         Token::new(TokenType::Eof, "".to_string(), None, line)
     }
