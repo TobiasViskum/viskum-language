@@ -11,6 +11,7 @@ pub fn generate_ast(output_dir: &String) -> io::Result<()> {
     define_ast(
         output_dir,
         &"Expr".to_string(),
+        vec!["error_handler::ViskumError", "token::Token", "token::Literal"],
         vec![
             "Binary   : left: Box<Expr>, operator: Token, right: Box<Expr>",
             "Grouping : expression: Box<Expr>",
@@ -24,21 +25,30 @@ pub fn generate_ast(output_dir: &String) -> io::Result<()> {
     define_ast(
         output_dir,
         &"Stmt".to_string(),
+        vec!["error_handler::ViskumError", "token::Token", "token::Literal", "expr::Expr"],
         vec!["Expression : expression: Box<Expr>", "Print      : expression: Box<Expr>"]
     )?;
 
     Ok(())
 }
 
-fn define_ast(output_dir: &String, base_name: &String, types: Vec<&str>) -> io::Result<()> {
-    let path = format!("{}/{}.rs", output_dir, base_name.to_lowercase());
+fn define_ast(
+    output_dir: &String,
+    base_name: &String,
+    crates: Vec<&str>,
+    types: Vec<&str>
+) -> io::Result<()> {
+    let base_name_lowercase = base_name.to_lowercase();
+    let path: String = format!("{}/{}.rs", output_dir, base_name_lowercase);
     let mut file = File::create(path)?;
     let mut tree_types: Vec<TreeType> = Vec::new();
     let return_type = "Result<T, ViskumError>";
 
-    writeln!(file, "use crate::error_handler::ViskumError;")?;
-    writeln!(file, "use crate::token::Token;")?;
-    writeln!(file, "use crate::token::Literal;\n")?;
+    for crate_ in crates {
+        writeln!(file, "use crate::{};", crate_)?;
+    }
+
+    writeln!(file)?;
 
     for ttype in types {
         let (base_class_name, args) = ttype.split_once(":").unwrap();
@@ -68,12 +78,15 @@ fn define_ast(output_dir: &String, base_name: &String, types: Vec<&str>) -> io::
     writeln!(file, "impl {base_name} {{")?;
     writeln!(
         file,
-        "    pub fn accept<T>(&self, expr_visitor: &dyn ExprVisitor<T>) -> {return_type} {{"
+        "    pub fn accept<T>(&self, {base_name_lowercase}_visitor: &dyn {base_name}Visitor<T>) -> {return_type} {{"
     )?;
     writeln!(file, "        match self {{")?;
     for tree_type in &tree_types {
         let base_class_name = &tree_type.base_class_name;
-        writeln!(file, "            Expr::{base_class_name}(expr) => expr.accept(expr_visitor),")?;
+        writeln!(
+            file,
+            "            {base_name}::{base_class_name}({base_name_lowercase}) => {base_name_lowercase}.accept({base_name_lowercase}_visitor),"
+        )?;
     }
     writeln!(file, "        }}")?;
     writeln!(file, "    }}")?;
@@ -90,12 +103,12 @@ fn define_ast(output_dir: &String, base_name: &String, types: Vec<&str>) -> io::
         writeln!(file, "}}")?;
     }
 
-    writeln!(file, "pub trait ExprVisitor<T> {{")?;
+    writeln!(file, "pub trait {base_name}Visitor<T> {{")?;
 
     for tt in &tree_types {
         writeln!(
             file,
-            "    fn visit_{}_{}(&self, expr: &{}) -> {return_type};",
+            "    fn visit_{}_{}(&self, {base_name_lowercase}: &{}) -> {return_type};",
             tt.base_class_name.to_lowercase(),
             base_name.to_lowercase(),
             tt.class_name
@@ -108,7 +121,7 @@ fn define_ast(output_dir: &String, base_name: &String, types: Vec<&str>) -> io::
         writeln!(file, "impl {} {{", tt.class_name)?;
         writeln!(
             file,
-            "    pub fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> {return_type} {{"
+            "    pub fn accept<T>(&self, visitor: &dyn {base_name}Visitor<T>) -> {return_type} {{"
         )?;
         writeln!(
             file,
