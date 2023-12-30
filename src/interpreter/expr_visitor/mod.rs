@@ -135,4 +135,34 @@ impl<'a> ExprVisitor<Output> for Interpreter<'a> {
             )?
         )
     }
+
+    fn visit_logical_expr(&self, expr: &LogicalExpr) -> Result<Output, ViskumError> {
+        let lhs_evaluated = self.evaluate(&expr.left)?;
+
+        match expr.operator.ttype {
+            TokenType::Or => {
+                if self.is_truthy(&lhs_evaluated) {
+                    Ok(lhs_evaluated)
+                } else {
+                    Ok(self.evaluate(&expr.right)?)
+                }
+            }
+            TokenType::And => {
+                if self.is_truthy(&lhs_evaluated) {
+                    Ok(self.evaluate(&expr.right)?)
+                } else {
+                    Ok(lhs_evaluated)
+                }
+            }
+            _ => {
+                return Err(
+                    ViskumError::new(
+                        format!("Invalid logical operator: {}", expr.operator.lexeme).as_str(),
+                        expr.operator.clone(),
+                        "file.vs"
+                    )
+                );
+            }
+        }
+    }
 }

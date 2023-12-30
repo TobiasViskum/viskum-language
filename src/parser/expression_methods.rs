@@ -1,3 +1,5 @@
+use statrs::distribution::Exp;
+
 use crate::{
     expr::{
         Expr,
@@ -9,6 +11,7 @@ use crate::{
         TernaryExpr,
         VariableExpr,
         AssignExpr,
+        LogicalExpr,
     },
     error_handler::ViskumError,
     token::{ TokenType, Literal },
@@ -38,7 +41,7 @@ impl<'a> Parser<'a> {
     }
 
     fn assignment(&mut self) -> Result<Expr, ViskumError> {
-        let expr = self.ternary()?;
+        let expr = self.expression_no_assign()?;
 
         if self.match_tokens(&[TokenType::Equal])? {
             let equals = self.peek_previous()?;
@@ -61,15 +64,38 @@ impl<'a> Parser<'a> {
         Ok(expr)
     }
 
+    fn expression_no_assign(&mut self) -> Result<Expr, ViskumError> {
+        self.logical()
+    }
+
+    fn logical(&mut self) -> Result<Expr, ViskumError> {
+        let lhs = self.ternary()?;
+
+        if self.match_tokens(&[TokenType::Or, TokenType::And])? {
+            let operator = self.peek_previous()?;
+            let rhs = self.expression_no_assign()?;
+
+            Ok(
+                Expr::Logical(LogicalExpr {
+                    left: Box::from(lhs),
+                    operator: operator,
+                    right: Box::from(rhs),
+                })
+            )
+        } else {
+            Ok(lhs)
+        }
+    }
+
     fn ternary(&mut self) -> Result<Expr, ViskumError> {
         let condition_expr = self.equality()?;
 
         if self.match_tokens(&[TokenType::QuestionMark])? {
-            let true_expr = self.equality()?;
+            let true_expr = self.expression_no_assign()?;
 
             self.consume(TokenType::Colon, "Expected ':' in ternary expression")?;
 
-            let false_expr = self.equality()?;
+            let false_expr = self.expression_no_assign()?;
 
             return Ok(
                 Expr::Ternary(TernaryExpr {

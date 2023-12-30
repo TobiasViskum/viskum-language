@@ -85,4 +85,7 @@ impl ExprVisitor<Output> for AstPrinter {
     fn visit_assign_expr(&self, expr: &AssignExpr) -> Result<Output, ViskumError> {
         todo!()
     }
+    fn visit_logical_expr(&self, expr: &LogicalExpr) -> Result<Output, ViskumError> {
+        todo!()
+    }
 }

@@ -26,7 +26,7 @@ impl<'a> Parser<'a> {
 
         let then_branch = self.statement()?;
 
-        if peeked_token.ttype == TokenType::LeftBrace {
+        if peeked_token.is(TokenType::LeftBrace) {
             let else_branch = if self.match_tokens(&[TokenType::Else])? {
                 Some(self.statement()?)
             } else {

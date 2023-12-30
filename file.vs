@@ -8,7 +8,8 @@ if 1 + 2 == 2 {
   result = "third";
 }
 
-print result;
+
+print "true3" or !!"false";
 
 
 

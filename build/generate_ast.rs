@@ -16,6 +16,7 @@ pub fn generate_ast(output_dir: &String) -> io::Result<()> {
             "Binary   : left: Box<Expr>, operator: Token, right: Box<Expr>",
             "Grouping : expression: Box<Expr>",
             "Literal  : value: Option<Literal>",
+            "Logical  : left: Box<Expr>, operator: Token, right: Box<Expr>",
             "Prefix   : operator: Token, right: Box<Expr>",
             "Postfix  : left: Box<Expr>, operator: Token",
             "Ternary  : condition: Box<Expr>, true_expr: Box<Expr>, false_expr: Box<Expr>",
