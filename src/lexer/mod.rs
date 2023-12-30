@@ -16,11 +16,11 @@ pub struct Lexer<'a> {
     current: usize,
     line: usize,
     line_position: usize,
-    error_handler: &'a Rc<RefCell<ErrorHandler>>,
+    error_handler: &'a RefCell<ErrorHandler>,
 }
 
 impl<'a> Lexer<'a> {
-    pub fn new(source: String, error_handler: &'a Rc<RefCell<ErrorHandler>>) -> Self {
+    pub fn new(source: String, error_handler: &'a RefCell<ErrorHandler>) -> Self {
         Lexer {
             source: source.chars().collect(),
             tokens: Vec::new(),

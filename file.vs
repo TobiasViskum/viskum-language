@@ -1,11 +1,23 @@
-let a = (1 + 1) * 2;
-let b = 4;
-let c = 2;
-
-d = 22;
-print a;
-a = 2;
-print d;
+let a = "global a";
+let b = "global b";
+let c = "global c";
+{
+  let a = "outer a";
+  let b = "outer b";
+  {
+    let a = "inner a";
+    c = "This was modified";
+    print a; // inner a
+    print b; // outer b
+    print c; // global c
+  }
+  print a; // outer a
+  print b; // outer b
+  print c; // global c
+}
+print a; // global a
+print b; // global b
+print c; // global c
 
 /*
 if 1 + 1 == 2 ? "this is cool or" : "not"

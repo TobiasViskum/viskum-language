@@ -8,7 +8,7 @@ use super::Interpreter;
 
 impl<'a> Interpreter<'a> {
     pub fn environment_get(&self, token: &Token) -> Result<Literal, ViskumError> {
-        (*self.environment).borrow().get(token)
+        (*self.environment).borrow().borrow().get(token)
     }
 
     pub fn environment_define(
@@ -16,7 +16,7 @@ impl<'a> Interpreter<'a> {
         token: &Token,
         environment_value: EnvironmentValue
     ) -> Result<Literal, ViskumError> {
-        (*self.environment).borrow_mut().define(token, environment_value)
+        (*self.environment).borrow_mut().borrow_mut().define(token, environment_value)
     }
 
     pub fn environment_assign(
@@ -24,6 +24,6 @@ impl<'a> Interpreter<'a> {
         token: &Token,
         environment_value: EnvironmentValue
     ) -> Result<Literal, ViskumError> {
-        (*self.environment).borrow_mut().assign(token, environment_value)
+        (*self.environment).borrow_mut().borrow_mut().assign(token, environment_value)
     }
 }

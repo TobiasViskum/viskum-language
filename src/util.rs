@@ -10,7 +10,7 @@ pub fn is_alphabetic(ch: Option<char>) -> bool {
     if let Some(ch) = ch { ch.is_ascii_alphabetic() || ch == '_' } else { false }
 }
 
-pub fn report_error(error_handler: &Rc<RefCell<ErrorHandler>>, viskum_error: ViskumError) {
+pub fn report_error(error_handler: &RefCell<ErrorHandler>, viskum_error: ViskumError) {
     error_handler.borrow_mut().report_error(viskum_error)
 }
 

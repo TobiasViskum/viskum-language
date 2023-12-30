@@ -1,14 +1,15 @@
 pub mod environment_value;
 
-use std::collections::HashMap;
+use std::{ collections::HashMap, cell::RefCell, rc::Rc };
 
 use crate::{ token::{ Literal, Token }, error_handler::ViskumError };
 
 use self::environment_value::EnvironmentValue;
 
+#[derive(Debug)]
 pub struct Environment {
     values: HashMap<String, EnvironmentValue>,
-    enclosing: Option<Box<Environment>>,
+    enclosing: Option<Rc<RefCell<Environment>>>,
 }
 
 impl Environment {
@@ -16,9 +17,15 @@ impl Environment {
         Environment { values: HashMap::new(), enclosing: None }
     }
 
+    pub fn new_with_enclosing(environment: Rc<RefCell<Environment>>) -> Self {
+        Environment { values: HashMap::new(), enclosing: Some(environment) }
+    }
+
     pub fn get(&self, token: &Token) -> Result<Literal, ViskumError> {
-        if let Some(v) = self.values.get(&token.lexeme) {
-            Ok(v.get_value())
+        if let Some(literal) = self.values.get(&token.lexeme) {
+            Ok(literal.get_value())
+        } else if let Some(enclosing) = &self.enclosing {
+            enclosing.borrow().get(token)
         } else {
             Err(
                 ViskumError::new(
@@ -47,6 +54,8 @@ impl Environment {
     ) -> Result<Literal, ViskumError> {
         if self.values.contains_key(&token.lexeme) {
             self.define(token, environment_value)
+        } else if let Some(enclosing) = &self.enclosing {
+            Ok(enclosing.borrow_mut().assign(token, environment_value)?)
         } else {
             Err(
                 ViskumError::new(

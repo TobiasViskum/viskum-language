@@ -13,22 +13,22 @@ use crate::{
 };
 
 pub struct Interpreter<'a> {
-    error_handler: &'a Rc<RefCell<ErrorHandler>>,
-    environment: &'a Rc<RefCell<Environment>>,
+    error_handler: &'a RefCell<ErrorHandler>,
+    environment: &'a RefCell<Rc<RefCell<Environment>>>,
 }
 
 type Output = Literal;
 
 impl<'a> Interpreter<'a> {
     pub fn new(
-        error_handler: &'a Rc<RefCell<ErrorHandler>>,
-        environment: &'a Rc<RefCell<Environment>>
+        error_handler: &'a RefCell<ErrorHandler>,
+        environment: &'a RefCell<Rc<RefCell<Environment>>>
     ) -> Self {
         Interpreter { error_handler: error_handler, environment: environment }
     }
 
     pub fn interpret(&self, statements: Vec<Stmt>) {
-        for stmt in statements {
+        for stmt in &statements {
             match self.execute(stmt) {
                 Ok(_) => (),
                 Err(e) => {
@@ -40,7 +40,7 @@ impl<'a> Interpreter<'a> {
         }
     }
 
-    fn execute(&self, stmt: Stmt) -> Result<(), ViskumError> {
+    fn execute(&self, stmt: &Stmt) -> Result<(), ViskumError> {
         stmt.accept(self)
     }
 

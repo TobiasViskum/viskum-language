@@ -13,12 +13,12 @@ use std::io::{ self, BufRead, Result, stdout, Write };
 use std::process;
 
 pub struct Viskum {
-    environment: Rc<RefCell<Environment>>,
+    environment: RefCell<Rc<RefCell<Environment>>>,
 }
 
 impl Viskum {
     pub fn new() -> Self {
-        let environment = Rc::new(RefCell::new(Environment::new()));
+        let environment = RefCell::new(Rc::new(RefCell::new(Environment::new())));
         Viskum { environment }
     }
 
@@ -43,7 +43,11 @@ impl Viskum {
                 if line.is_empty() {
                     break;
                 }
-                self.run(line.as_str());
+                if line == "@" {
+                    println!("{:?}", self.environment);
+                } else {
+                    self.run(line.as_str());
+                }
             } else {
                 break;
             }
@@ -53,7 +57,7 @@ impl Viskum {
     }
 
     pub fn run(&self, source: &str) {
-        let error_handler = Rc::new(RefCell::new(ErrorHandler::new()));
+        let error_handler = RefCell::new(ErrorHandler::new());
 
         let mut lexer = Lexer::new(source.to_string(), &error_handler);
 
