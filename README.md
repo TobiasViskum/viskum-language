@@ -10,7 +10,7 @@ I'm following this book: https://craftinginterpreters.com/contents.html. I'm wri
 
 <code>let a = 2</code>
 
-If you want the variable to mutable, you follow the Rust syntax
+If you want the variable to mutable, you follow the Rust syntax (not implemented yet. For now all variables are mutable)
 
 <code>let mut a = 2</code>
 
