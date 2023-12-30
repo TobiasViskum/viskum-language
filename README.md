@@ -31,11 +31,5 @@ And then there are all the standard operations as well, that you see in most pro
 Single line comments:
 <code>// This is a comment</code>
 
-Multi line comments:
-<code>/\*
-
-This is a
-
-multi line comment
-
-\*/ </code>
+Block comments:
+<code>/\* This is a block comment \*/ </code>
