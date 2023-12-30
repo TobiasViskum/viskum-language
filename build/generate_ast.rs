@@ -34,7 +34,9 @@ pub fn generate_ast(output_dir: &String) -> io::Result<()> {
             "Expression : expression: Expr",
             "If         : condition: Expr, then_branch: Box<Stmt>, else_branch: Option<Box<Stmt>>",
             "Print      : expression: Expr",
-            "Let        : token: Token, initializer: Expr"
+            "Let        : token: Token, initializer: Expr",
+            "While      : condition: Expr, body: Box<Stmt>"
+            // "Loop : body: Box<Stmt>" break has to be implemented first
         ]
     )?;
 

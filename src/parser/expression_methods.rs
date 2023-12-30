@@ -1,5 +1,3 @@
-use statrs::distribution::Exp;
-
 use crate::{
     expr::{
         Expr,
@@ -37,15 +35,15 @@ impl<'a> Parser<'a> {
     }
 
     pub(super) fn expression(&mut self) -> Result<Expr, ViskumError> {
-        self.assignment()
+        self.logical()
     }
 
-    fn assignment(&mut self) -> Result<Expr, ViskumError> {
-        let expr = self.expression_no_assign()?;
+    pub(super) fn assignment(&mut self) -> Result<Expr, ViskumError> {
+        let expr = self.expression()?;
 
         if self.match_tokens(&[TokenType::Equal])? {
             let equals = self.peek_previous()?;
-            let value = self.assignment()?;
+            let value = self.expression()?;
 
             if let Expr::Variable(expr) = expr {
                 return Ok(Expr::Assign(AssignExpr { token: expr.token, value: Box::from(value) }));
@@ -64,16 +62,12 @@ impl<'a> Parser<'a> {
         Ok(expr)
     }
 
-    fn expression_no_assign(&mut self) -> Result<Expr, ViskumError> {
-        self.logical()
-    }
-
     fn logical(&mut self) -> Result<Expr, ViskumError> {
         let lhs = self.ternary()?;
 
         if self.match_tokens(&[TokenType::Or, TokenType::And])? {
             let operator = self.peek_previous()?;
-            let rhs = self.expression_no_assign()?;
+            let rhs = self.expression()?;
 
             Ok(
                 Expr::Logical(LogicalExpr {
@@ -91,11 +85,11 @@ impl<'a> Parser<'a> {
         let condition_expr = self.equality()?;
 
         if self.match_tokens(&[TokenType::QuestionMark])? {
-            let true_expr = self.expression_no_assign()?;
+            let true_expr = self.expression()?;
 
             self.consume(TokenType::Colon, "Expected ':' in ternary expression")?;
 
-            let false_expr = self.expression_no_assign()?;
+            let false_expr = self.expression()?;
 
             return Ok(
                 Expr::Ternary(TernaryExpr {
@@ -228,7 +222,7 @@ impl<'a> Parser<'a> {
 
         if self.match_tokens(&[TokenType::LeftParen])? {
             let expr = self.expression()?;
-            let _ = self.consume(TokenType::RightParen, "Expected ')' after expression")?;
+            self.consume(TokenType::RightParen, "Expected ')' after expression")?;
 
             if self.match_tokens(&[TokenType::Factorial])? {
                 let operator = self.peek_previous()?;

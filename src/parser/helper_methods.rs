@@ -49,6 +49,16 @@ impl<'a> Parser<'a> {
         Ok(false)
     }
 
+    pub(super) fn ensure(&self, ttype: TokenType, msg: &str) -> Result<bool, ViskumError> {
+        let token = self.peek()?;
+
+        if token.is(ttype) {
+            Ok(true)
+        } else {
+            Err(ViskumError::new(msg, token, "file.vs"))
+        }
+    }
+
     pub(super) fn check(&self, ttype: &TokenType) -> Result<bool, ViskumError> {
         if self.is_at_end()? { Ok(false) } else { Ok(&self.peek()?.ttype == ttype) }
     }
@@ -130,7 +140,7 @@ impl<'a> Parser<'a> {
             {
                 return Ok(());
             }
-            let _ = self.advance();
+            self.advance()?;
         }
 
         Ok(())

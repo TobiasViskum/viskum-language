@@ -4,7 +4,6 @@ use crate::{
     stmt::*,
     error_handler::ViskumError,
     environment::{ environment_value::EnvironmentValue, Environment },
-    token::Literal,
 };
 
 use super::Interpreter;
@@ -41,7 +40,15 @@ impl<'a> StmtVisitor<Output> for Interpreter<'a> {
     fn visit_let_stmt(&self, stmt: &LetStmt) -> Result<Output, ViskumError> {
         let value = self.evaluate(&stmt.initializer)?;
 
-        let _ = self.environment_define(&stmt.token, EnvironmentValue::new(value, false));
+        self.environment_define(&stmt.token, EnvironmentValue::new(value, false))?;
+
+        Ok(())
+    }
+
+    fn visit_while_stmt(&self, stmt: &WhileStmt) -> Result<Output, ViskumError> {
+        while self.is_truthy(&self.evaluate(&stmt.condition)?) {
+            self.execute(&stmt.body)?;
+        }
 
         Ok(())
     }

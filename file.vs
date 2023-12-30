@@ -12,6 +12,15 @@ if 1 + 2 == 2 {
 print "true3" or !!"false";
 
 
+let count = 0;
+
+while count < 10 {
+  count = count + 1;
+  print count;
+}
+
+print("Finished");
+
 
 /*
 if 1 + 1 == 2 ? "this is cool or" : "not"

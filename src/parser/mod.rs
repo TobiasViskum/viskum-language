@@ -1,4 +1,4 @@
-use std::{ cell::RefCell, rc::Rc };
+use std::cell::RefCell;
 
 mod helper_methods;
 mod expression_methods;
@@ -40,19 +40,21 @@ impl<'a> Parser<'a> {
         };
 
         if result.is_err() {
-            self.synchronize();
+            self.synchronize()?;
         }
 
         result
     }
 
     fn statement(&mut self) -> Result<Stmt, ViskumError> {
-        if self.match_tokens(&[TokenType::If])? {
+        if self.match_tokens(&[TokenType::While])? {
+            self.while_statement()
+        } else if self.match_tokens(&[TokenType::If])? {
             self.if_statement()
         } else if self.match_tokens(&[TokenType::Print])? {
             self.print_statement()
         } else if self.match_tokens(&[TokenType::LeftBrace])? {
-            Ok(Stmt::Block(BlockStmt { statements: self.block_statement()? }))
+            Ok(Stmt::Block(BlockStmt { statements: self.block()? }))
         } else {
             self.expression_statement()
         }
