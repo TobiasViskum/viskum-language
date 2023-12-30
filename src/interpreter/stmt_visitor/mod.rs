@@ -4,6 +4,7 @@ use crate::{
     stmt::*,
     error_handler::ViskumError,
     environment::{ environment_value::EnvironmentValue, Environment },
+    token::Literal,
 };
 
 use super::Interpreter;
@@ -18,6 +19,16 @@ impl<'a> StmtVisitor<Output> for Interpreter<'a> {
 
     fn visit_expression_stmt(&self, stmt: &ExpressionStmt) -> Result<Output, ViskumError> {
         self.evaluate(&stmt.expression)?;
+        Ok(())
+    }
+
+    fn visit_if_stmt(&self, stmt: &IfStmt) -> Result<Output, ViskumError> {
+        if self.is_truthy(&self.evaluate(&stmt.condition)?) {
+            self.execute(&stmt.then_branch)?;
+        } else if let Some(else_branch) = &stmt.else_branch {
+            self.execute(&else_branch)?;
+        }
+
         Ok(())
     }
 

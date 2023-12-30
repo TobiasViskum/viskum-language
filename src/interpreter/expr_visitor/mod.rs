@@ -12,19 +12,6 @@ use super::Interpreter;
 
 type Output = Literal;
 
-impl<'a> Interpreter<'a> {
-    // 0, null and false are false. Everything else is true
-    fn is_truthy(&self, literal: &Literal) -> bool {
-        match literal {
-            Literal::Bool(false) | Literal::Null => false,
-            Literal::Num(x) => {
-                if *x == 0.0 { false } else { true }
-            }
-            _ => true,
-        }
-    }
-}
-
 impl<'a> ExprVisitor<Output> for Interpreter<'a> {
     fn visit_binary_expr(&self, expr: &BinaryExpr) -> Result<Output, ViskumError> {
         let left = self.evaluate(&expr.left)?;

@@ -30,7 +30,7 @@ impl<'a> Parser<'a> {
 
         self.consume(TokenType::Semicolon, "Expected ';' after variable declaration")?;
 
-        Ok(Stmt::Let(LetStmt { token: token, initializer: Box::from(initializer) }))
+        Ok(Stmt::Let(LetStmt { token: token, initializer: initializer }))
     }
 
     pub(super) fn expression(&mut self) -> Result<Expr, ViskumError> {

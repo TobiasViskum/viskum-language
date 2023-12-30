@@ -47,24 +47,14 @@ impl<'a> Parser<'a> {
     }
 
     fn statement(&mut self) -> Result<Stmt, ViskumError> {
-        if self.match_tokens(&[TokenType::Print])? {
+        if self.match_tokens(&[TokenType::If])? {
+            self.if_statement()
+        } else if self.match_tokens(&[TokenType::Print])? {
             self.print_statement()
         } else if self.match_tokens(&[TokenType::LeftBrace])? {
             Ok(Stmt::Block(BlockStmt { statements: self.block_statement()? }))
         } else {
             self.expression_statement()
         }
-    }
-
-    fn block_statement(&mut self) -> Result<Vec<Stmt>, ViskumError> {
-        let mut statements: Vec<Stmt> = Vec::new();
-
-        while !self.check(&TokenType::RightBrace)? && !self.is_at_end()? {
-            statements.push(self.declaration()?);
-        }
-
-        self.consume(TokenType::RightBrace, "Expected '}' after block")?;
-
-        Ok(statements)
     }
 }

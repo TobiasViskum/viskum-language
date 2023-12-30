@@ -1,23 +1,16 @@
-let a = "global a";
-let b = "global b";
-let c = "global c";
-{
-  let a = "outer a";
-  let b = "outer b";
-  {
-    let a = "inner a";
-    c = "This was modified";
-    print a; // inner a
-    print b; // outer b
-    print c; // global c
-  }
-  print a; // outer a
-  print b; // outer b
-  print c; // global c
+let result = "No match";
+
+if 1 + 2 == 2 {
+  result = "first";
+} else if 2 + 2 == 4 {
+  result = "second";
+} else {
+  result = "third";
 }
-print a; // global a
-print b; // global b
-print c; // global c
+
+print result;
+
+
 
 /*
 if 1 + 1 == 2 ? "this is cool or" : "not"

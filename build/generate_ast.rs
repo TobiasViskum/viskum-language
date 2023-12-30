@@ -30,9 +30,10 @@ pub fn generate_ast(output_dir: &String) -> io::Result<()> {
         vec!["error_handler::ViskumError", "token::Token", "expr::Expr"],
         vec![
             "Block      : statements: Vec<Stmt>",
-            "Expression : expression: Box<Expr>",
-            "Print      : expression: Box<Expr>",
-            "Let        : token: Token, initializer: Box<Expr>"
+            "Expression : expression: Expr",
+            "If         : condition: Expr, then_branch: Box<Stmt>, else_branch: Option<Box<Stmt>>",
+            "Print      : expression: Expr",
+            "Let        : token: Token, initializer: Expr"
         ]
     )?;
 

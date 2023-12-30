@@ -47,4 +47,14 @@ impl<'a> Interpreter<'a> {
     fn evaluate(&self, expr: &Expr) -> Result<Output, ViskumError> {
         expr.accept(self)
     }
+
+    fn is_truthy(&self, literal: &Literal) -> bool {
+        match literal {
+            Literal::Bool(false) | Literal::Null => false,
+            Literal::Num(x) => {
+                if *x == 0.0 { false } else { true }
+            }
+            _ => true,
+        }
+    }
 }
