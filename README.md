@@ -2,7 +2,7 @@
 
 An interpreter (and maybe compiler?) for the Viskum Programming Language
 
-I'm following this book: https://craftinginterpreters.com/contents.html. I'm writing it in Rust instead of Java.
+I'm following this book: https://craftinginterpreters.com/contents.html. I'm writing it in Rust instead of Java, adding additional features and using my own syntax.
 
 ## Syntax
 
