@@ -17,6 +17,7 @@ If you want the variable to mutable, you follow the Rust syntax
 ### Extended mathematical operations
 
 <code>5! = 5 \* 4 \* 3 \* 2 \* 1</code>
+<br/>
 <code>5^2 = 25</code>
 
 And then there are all the standard operations as well, that you see in most programming languages.
