@@ -36,10 +36,10 @@ Block comments:
 <br/>
 
 ```
-/\*
+\*
 This is a
 block comment
-\*/
+*/
 ```
 
 ### If statements
