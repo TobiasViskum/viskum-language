@@ -12,12 +12,22 @@ I'm following this book: https://craftinginterpreters.com/contents.html. I'm wri
 - Support for decrement (--)
 - Support for increment and assign (+=)
 - Support for decrement and assign (-=)
+- Support for break keyword
 
 Maybe support for these as well:
 
 - variable \*= 2;
 - variable /= 2;
 - variable ^= 2;
+
+## Advanced pre-runtime error checker
+
+- Check for infinite loops (error)
+- Check for for example number + string (error)
+- Check for no return statement if it's expected (error)
+- Check for non-mutable variables that's assigned to a new value (error)
+
+- Check for unused variables (warning)
 
 ## Syntax
 
