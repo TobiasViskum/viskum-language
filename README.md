@@ -32,4 +32,10 @@ Single line comments:
 <code>// This is a comment</code>
 
 Multi line comments:
-<code>/\* <br/> This is a <br/> multi line comment </code>
+<code>/\*
+
+This is a
+
+multi line comment
+
+\*/ </code>
