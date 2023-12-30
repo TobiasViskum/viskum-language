@@ -4,6 +4,11 @@ An interpreter (and maybe compiler?) for the Viskum Programming Language
 
 I'm following this book: https://craftinginterpreters.com/contents.html. I'm writing it in Rust instead of Java.
 
+## Todo
+
+- Loops (while, loop, for i, v in arr {}, for i = 0, i < 2, i++ {})
+- Functions
+
 ## Syntax
 
 ### Variable declaration
