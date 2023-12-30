@@ -20,9 +20,13 @@ let mut a = 2
 
 ### Extended mathematical operations
 
+Factorial (5! = 5 \* 4 \* 3 \* 2 \* 1):
+
 ```
-5! = 5 \* 4 \* 3 \* 2 \* 1
+5! = 120
 ```
+
+Raise a number to the power of x:
 
 ```
 5^2 = 25
@@ -55,4 +59,30 @@ block comment
 
 ### If statements
 
-<code></code>
+```
+if some_expression {
+    // Do some stuff
+} else if another_expression {
+    // Do something else
+} else {
+    // If none of the two other expressions were true
+}
+```
+
+### Logical operators
+
+And:
+
+```
+if expr_1 and expr_2 {
+    // Do something if both expressions were true
+}
+```
+
+Or:
+
+```
+if expr_1 or expr_2 {
+    // Do something if just one of them were true
+}
+```
