@@ -51,9 +51,11 @@ Single line comments:
 Block comments:
 
 ```
-\*
+/*
+
 This is a
 block comment
+
 */
 ```
 
