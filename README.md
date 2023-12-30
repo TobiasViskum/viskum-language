@@ -20,7 +20,7 @@ Maybe support for these as well:
 - variable /= 2;
 - variable ^= 2;
 
-## Advanced pre-runtime error checker
+## Advanced pre-runtime error checker (todo)
 
 - Check for infinite loops (error)
 - Check for for example number + string (error)
