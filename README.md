@@ -8,32 +8,43 @@ I'm following this book: https://craftinginterpreters.com/contents.html. I'm wri
 
 ### Variable declaration
 
-<code>let a = 2</code>
+```
+let a = 2
+```
 
 If you want the variable to mutable, you follow the Rust syntax (not implemented yet. For now all variables are mutable)
 
-<code>let mut a = 2</code>
+```
+let mut a = 2
+```
 
 ### Extended mathematical operations
 
-<code>5! = 5 \* 4 \* 3 \* 2 \* 1</code>
-<br/>
-<code>5^2 = 25</code>
+```
+5! = 5 \* 4 \* 3 \* 2 \* 1
+```
+
+```
+5^2 = 25
+```
 
 And then there are all the standard operations as well, that you see in most programming languages.
 
 ### Ternary operator
 
-<code>1 + 2 == 3 ? "This was true" : "This was false"</code>
+```
+1 + 2 == 3 ? "This was true" : "This was false"
+```
 
 ### Comments
 
 Single line comments:
-<br/>
-<code>// This is a comment</code>
+
+```
+// This is a comment
+```
 
 Block comments:
-<br/>
 
 ```
 \*
