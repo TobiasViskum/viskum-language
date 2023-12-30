@@ -29,7 +29,9 @@ And then there are all the standard operations as well, that you see in most pro
 ### Comments
 
 Single line comments:
+<br/>
 <code>// This is a comment</code>
 
 Block comments:
+<br/>
 <code>/\* This is a block comment \*/ </code>
