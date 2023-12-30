@@ -25,3 +25,11 @@ And then there are all the standard operations as well, that you see in most pro
 ### Ternary operator
 
 <code>1 + 2 == 3 ? "This was true" : "This was false"</code>
+
+### Comments
+
+Single line comments:
+<code>// This is a comment</code>
+
+Multi line comments:
+<code>/\* <br/> This is a <br/> multi line comment </code>
