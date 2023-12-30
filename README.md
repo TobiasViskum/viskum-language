@@ -4,31 +4,6 @@ An interpreter (and maybe compiler?) for the Viskum Programming Language
 
 I'm following this book: https://craftinginterpreters.com/contents.html. I'm writing it in Rust instead of Java.
 
-## Todo
-
-- Loops (loop, for value in arr {}, for i = 0; i < 2; i++ {})
-- Functions
-- Support for increment (++)
-- Support for decrement (--)
-- Support for increment and assign (+=)
-- Support for decrement and assign (-=)
-- Support for break keyword
-
-Maybe support for these as well:
-
-- variable \*= 2;
-- variable /= 2;
-- variable ^= 2;
-
-## Advanced pre-runtime error checker (todo)
-
-- Check for infinite loops (error)
-- Check for for example number + string (error)
-- Check for no return statement if it's expected (error)
-- Check for non-mutable variables that's assigned to a new value (error)
-
-- Check for unused variables (warning)
-
 ## Syntax
 
 ### Variable declaration
@@ -123,3 +98,28 @@ while some_expr {
     // Do something
 }
 ```
+
+## Todo
+
+- Loops (loop, for value in arr {}, for i = 0; i < 2; i++ {})
+- Functions
+- Support for increment (++)
+- Support for decrement (--)
+- Support for increment and assign (+=)
+- Support for decrement and assign (-=)
+- Support for break keyword
+
+Maybe support for these as well:
+
+- variable \*= 2;
+- variable /= 2;
+- variable ^= 2;
+
+## Advanced pre-runtime error checker (todo)
+
+- Check for infinite loops (error)
+- Check for for example number + string (error)
+- Check for no return statement if it's expected (error)
+- Check for non-mutable variables that's assigned to a new value (error)
+
+- Check for unused variables (warning)
