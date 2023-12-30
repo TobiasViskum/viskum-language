@@ -34,4 +34,14 @@ Single line comments:
 
 Block comments:
 <br/>
-<code>/\* This is a block comment \*/ </code>
+
+```
+/\*
+This is a
+block comment
+\*/
+```
+
+### If statements
+
+<code></code>
