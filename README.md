@@ -6,8 +6,18 @@ I'm following this book: https://craftinginterpreters.com/contents.html. I'm wri
 
 ## Todo
 
-- Loops (while, loop, for i, v in arr {}, for i = 0, i < 2, i++ {})
+- Loops (loop, for value in arr {}, for i = 0; i < 2; i++ {})
 - Functions
+- Support for increment (++)
+- Support for decrement (--)
+- Support for increment and assign (+=)
+- Support for decrement and assign (-=)
+
+Maybe support for these as well:
+
+- variable \*= 2;
+- variable /= 2;
+- variable ^= 2;
 
 ## Syntax
 
@@ -91,5 +101,15 @@ Or:
 ```
 if expr_1 or expr_2 {
     // Do something if just one of them were true
+}
+```
+
+### Loops
+
+While loop:
+
+```
+while some_expr {
+    // Do something
 }
 ```
