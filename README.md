@@ -6,7 +6,7 @@ I'm following this book: https://craftinginterpreters.com/contents.html. I'm wri
 
 ## Syntax
 
-Right now you have to end every expression with a semicolon. That's not how it's gonna work in the future, but that's how it works for now.
+<b>Notice:</b> Right now you have to end every expression with a semicolon. That's not how it's gonna work in the future, but that's how it works for now.
 
 ### Variable declaration
 
