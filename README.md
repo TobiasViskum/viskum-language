@@ -140,7 +140,7 @@ loop {
 
 ## Todo
 
-- Loops (loop, for value in arr {}, for i = 0; i < 2; i++ {})
+- For loops
 - Functions
 
 ## Advanced pre-runtime error checker (todo)
