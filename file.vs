@@ -1,3 +1,19 @@
+let counter = 0;
+
+loop {
+  counter++;
+  if counter == 5 {
+    continue;
+  }
+
+  if counter == 14 {
+    break;
+  }
+
+  print counter;
+}
+
+print "Finished";
 
 
 /*

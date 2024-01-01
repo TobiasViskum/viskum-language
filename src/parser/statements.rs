@@ -53,6 +53,14 @@ impl<'a> Parser<'a> {
         Ok(Stmt::While(WhileStmt { condition: condition, body: Box::from(body) }))
     }
 
+    pub(super) fn loop_statement(&mut self) -> Result<Stmt, ViskumError> {
+        self.ensure(TokenType::LeftBrace, "Expected '{' after loop keyword")?;
+
+        let body = self.statement()?;
+
+        Ok(Stmt::Loop(LoopStmt { body: Box::from(body) }))
+    }
+
     pub(super) fn block(&mut self) -> Result<Vec<Stmt>, ViskumError> {
         let mut statements: Vec<Stmt> = Vec::new();
 

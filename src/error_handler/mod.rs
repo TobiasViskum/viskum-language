@@ -1,6 +1,7 @@
 mod error;
 
 pub use error::ViskumError;
+pub use error::AbortReason;
 
 pub struct ErrorHandler {
     errors: Vec<ViskumError>,

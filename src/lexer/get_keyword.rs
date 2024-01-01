@@ -18,6 +18,9 @@ pub fn get_keyword(check: String) -> Option<TokenType> {
         "mut" => Some(TokenType::Mut),
         "while" => Some(TokenType::While),
         "new" => Some(TokenType::New),
+        "break" => Some(TokenType::Break),
+        "continue" => Some(TokenType::Continue),
+        "loop" => Some(TokenType::Loop),
         _ => None,
     }
 }

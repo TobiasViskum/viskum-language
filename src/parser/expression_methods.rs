@@ -323,6 +323,12 @@ impl<'a> Parser<'a> {
             return Ok(Expr::Grouping(GroupingExpr { expression: Box::from(expr) }));
         }
 
-        Err(ViskumError::new("Expected expression", self.peek()?, "file.vs"))
+        Err(
+            ViskumError::new(
+                format!("Expected expression: Unexpected '{}'", self.peek()?.lexeme).as_str(),
+                self.peek()?,
+                "file.vs"
+            )
+        )
     }
 }

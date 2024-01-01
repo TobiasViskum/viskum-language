@@ -37,7 +37,7 @@ a *= 3 // a: 12
 a /= 6 // a: 2
 a ^= 3 // a: 8
 a++ // a: 9
-a-- // a:8
+a-- // a: 8
 ```
 
 ### Extended mathematical operations
@@ -113,11 +113,26 @@ if expr_1 or expr_2 {
 
 ### Loops
 
+You can break any loop using the "break" keyword.
+You can continue to the next iteration of any loop by using the "continue" keyword.
+
 While loop:
 
 ```
 while some_expr {
     // Do something
+}
+```
+
+Loop without condition:
+
+```
+loop {
+    // Do something
+    if some_expr {
+        // Remember to break the loop
+        break
+    }
 }
 ```
 

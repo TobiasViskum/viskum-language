@@ -7,7 +7,7 @@ mod statements;
 use crate::{
     token::{ Token, TokenType },
     error_handler::{ ErrorHandler, ViskumError },
-    stmt::{ Stmt, BlockStmt },
+    stmt::{ Stmt, BlockStmt, LoopControlStmt },
 };
 
 pub struct Parser<'a> {
@@ -49,6 +49,12 @@ impl<'a> Parser<'a> {
     fn statement(&mut self) -> Result<Stmt, ViskumError> {
         if self.match_tokens(&[TokenType::While])? {
             self.while_statement()
+        } else if self.match_tokens(&[TokenType::Loop])? {
+            self.loop_statement()
+        } else if self.match_tokens(&[TokenType::Break, TokenType::Continue])? {
+            let keyword = self.peek_previous()?;
+            self.consume(TokenType::Semicolon, "Expected ';' after loop control statement")?;
+            Ok(Stmt::LoopControl(LoopControlStmt { keyword: keyword }))
         } else if self.match_tokens(&[TokenType::If])? {
             self.if_statement()
         } else if self.match_tokens(&[TokenType::Print])? {

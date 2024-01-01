@@ -22,6 +22,7 @@ pub fn generate_ast(output_dir: &String) -> io::Result<()> {
             "Ternary  : condition: Box<Expr>, true_expr: Box<Expr>, false_expr: Box<Expr>",
             "Variable : token: Token",
             "Assign   : token: Token, assignment_token: Token, value: Box<Expr>"
+            // A single expression for "break" and "continue". What should they be called?
         ]
     )?;
 
@@ -30,13 +31,14 @@ pub fn generate_ast(output_dir: &String) -> io::Result<()> {
         &"Stmt".to_string(),
         vec!["error_handler::ViskumError", "token::Token", "expr::Expr"],
         vec![
-            "Block      : statements: Vec<Stmt>",
-            "Expression : expression: Expr",
-            "If         : condition: Expr, then_branch: Box<Stmt>, else_branch: Option<Box<Stmt>>",
-            "Print      : expression: Expr",
-            "Let        : token: Token, initializer: Expr",
-            "While      : condition: Expr, body: Box<Stmt>"
-            // "Loop : body: Box<Stmt>" break has to be implemented first
+            "Block       : statements: Vec<Stmt>",
+            "Expression  : expression: Expr",
+            "If          : condition: Expr, then_branch: Box<Stmt>, else_branch: Option<Box<Stmt>>",
+            "Print       : expression: Expr",
+            "Let         : token: Token, initializer: Expr",
+            "While       : condition: Expr, body: Box<Stmt>",
+            "LoopControl : keyword: Token",
+            "Loop        : body: Box<Stmt>"
         ]
     )?;
 

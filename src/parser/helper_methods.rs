@@ -56,7 +56,8 @@ impl<'a> Parser<'a> {
         if token.is(ttype) {
             Ok(true)
         } else {
-            Err(ViskumError::new(msg, token, "file.vs"))
+            let new_msg = format!("{}: Unexpected '{}'", msg, token.lexeme);
+            Err(ViskumError::new(new_msg.as_str(), token, "file.vs"))
         }
     }
 

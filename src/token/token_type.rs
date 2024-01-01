@@ -53,6 +53,9 @@ pub enum TokenType {
     Let,
     Mut,
     While,
+    Break,
+    Continue,
+    Loop,
 
     Eof,
 
@@ -127,6 +130,9 @@ impl TokenType {
             Self::Let => "let",
             Self::Mut => "mut",
             Self::While => "while",
+            Self::Break => "break",
+            Self::Continue => "continue",
+            Self::Loop => "loop",
 
             Self::Eof => "end of file",
 

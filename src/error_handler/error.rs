@@ -2,16 +2,38 @@ use colorize::{ self, AnsiColor };
 
 use crate::token::Token;
 
+#[derive(Debug, PartialEq)]
+pub enum AbortReason {
+    Break,
+    Continue,
+}
+
 #[derive(Debug)]
 pub struct ViskumError {
     msg: String,
     token: Token,
     file: String,
+    abort_reason: Option<AbortReason>,
 }
 
 impl ViskumError {
     pub fn new(msg: &str, token: Token, file: &str) -> Self {
-        ViskumError { msg: msg.to_string(), token, file: file.to_string() }
+        ViskumError { msg: msg.to_string(), token, file: file.to_string(), abort_reason: None }
+    }
+    pub fn new_with_abort(msg: &str, token: Token, file: &str, reason: AbortReason) -> Self {
+        ViskumError {
+            msg: msg.to_string(),
+            token,
+            file: file.to_string(),
+            abort_reason: Some(reason),
+        }
+    }
+
+    pub fn is_abort_error(&self, abort_reason: AbortReason) -> bool {
+        match &self.abort_reason {
+            Some(reason) => reason == &abort_reason,
+            None => false,
+        }
     }
 
     pub fn to_string(&self) -> String {
