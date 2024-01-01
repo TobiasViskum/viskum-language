@@ -1,4 +1,4 @@
-use std::{ rc::Rc, cell::RefCell };
+use std::cell::RefCell;
 use statrs::function::gamma::gamma;
 use crate::error_handler::{ ErrorHandler, ViskumError };
 

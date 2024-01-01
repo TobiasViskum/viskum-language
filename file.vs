@@ -1,3 +1,6 @@
+
+
+/*
 let result = "No match";
 
 if 1 + 2 == 2 {
@@ -9,7 +12,7 @@ if 1 + 2 == 2 {
 }
 
 
-print "true3" or !!"false";
+print "string";
 
 
 let count = 0;
@@ -20,7 +23,7 @@ while count < 10 {
 }
 
 print("Finished");
-
+*/
 
 /*
 if 1 + 1 == 2 ? "this is cool or" : "not"

@@ -1,3 +1,5 @@
+use std::borrow::Borrow;
+
 use crate::{
     expr::{
         Expr,
@@ -41,23 +43,85 @@ impl<'a> Parser<'a> {
     pub(super) fn assignment(&mut self) -> Result<Expr, ViskumError> {
         let expr = self.expression()?;
 
-        if self.match_tokens(&[TokenType::Equal])? {
-            let equals = self.peek_previous()?;
-            let value = self.expression()?;
+        if
+            self.match_tokens(
+                &[
+                    TokenType::Equal,
+                    TokenType::PlusEqual,
+                    TokenType::MinusEqual,
+                    TokenType::StarEqual,
+                    TokenType::SlashEqual,
+                    TokenType::PowerEqual,
+                    TokenType::Increment,
+                    TokenType::Decrement,
+                ]
+            )?
+        {
+            let assignment_token = self.peek_previous()?;
+            if let Expr::Variable(var_expr) = expr.borrow() {
+                match self.peek_previous()?.ttype {
+                    TokenType::Increment | TokenType::Decrement => {
+                        return Ok(
+                            Expr::Assign(AssignExpr {
+                                token: var_expr.token.clone(),
+                                assignment_token: assignment_token,
+                                value: Box::from(expr),
+                            })
+                        );
+                    }
+                    _ => {
+                        let value = self.expression()?;
 
-            if let Expr::Variable(expr) = expr {
-                return Ok(Expr::Assign(AssignExpr { token: expr.token, value: Box::from(value) }));
+                        return Ok(
+                            Expr::Assign(AssignExpr {
+                                token: var_expr.token.clone(),
+                                assignment_token: assignment_token,
+                                value: Box::from(value),
+                            })
+                        );
+                    }
+                }
             } else {
                 report_error(
                     self.error_handler,
                     ViskumError::new(
-                        format!("Invalid assignment target '{}'", "unkown").as_str(),
-                        equals,
+                        format!(
+                            "Invalid assignment target at '{}'",
+                            assignment_token.lexeme
+                        ).as_str(),
+                        assignment_token,
                         "file.vs"
                     )
                 );
             }
         }
+        //  else if self.match_tokens(&[TokenType::Increment, TokenType::Decrement])? {
+        //     if let Expr::Variable(var_expr) = expr.borrow() {
+        //         return Ok(
+        //             Expr::Assign(AssignExpr {
+        //                 token: var_expr.token.clone(),
+
+        //                 value: Box::from(
+        //                     Expr::Postfix(PostfixExpr {
+        //                         left: Box::from(expr),
+        //                         operator: self.peek_previous()?,
+        //                     })
+        //                 ),
+        //             })
+        //         );
+        //     } else {
+        //         let equals = self.peek_previous()?;
+
+        //         report_error(
+        //             self.error_handler,
+        //             ViskumError::new(
+        //                 format!("Invalid assignment target at '{}'", equals.lexeme).as_str(),
+        //                 equals,
+        //                 "file.vs"
+        //             )
+        //         );
+        //     }
+        // }
 
         Ok(expr)
     }
@@ -196,6 +260,25 @@ impl<'a> Parser<'a> {
 
         Ok(self.primary()?)
     }
+
+    // fn postfix(&mut self) -> Result<Expr, ViskumError> {
+    //     println!("{}", self.peek()?);
+    //     println!("{}", self.peek_previous()?);
+    //     if
+    //         self.match_next_tokens(
+    //             &[TokenType::Factorial, TokenType::Increment, TokenType::Decrement]
+    //         )?
+    //     {
+    //         let operator = self.peek_next()?;
+    //         let left = self.primary()?;
+
+    //         self.advance()?;
+
+    //         return Ok(Expr::Postfix(PostfixExpr { left: Box::from(left), operator: operator }));
+    //     }
+
+    //     Ok(self.primary()?)
+    // }
 
     fn primary(&mut self) -> Result<Expr, ViskumError> {
         if self.match_tokens(&[TokenType::False])? {

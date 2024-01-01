@@ -23,7 +23,8 @@ impl<'a> Parser<'a> {
             Ok(self.advance()?)
         } else {
             let token = self.peek()?;
-            Err(ViskumError::new(msg, token, "file.vs"))
+            let new_msg = format!("{}: Unexpected '{}'", msg, token.lexeme);
+            Err(ViskumError::new(new_msg.as_str(), token, "file.vs"))
         }
     }
 

@@ -21,7 +21,7 @@ pub fn generate_ast(output_dir: &String) -> io::Result<()> {
             "Postfix  : left: Box<Expr>, operator: Token",
             "Ternary  : condition: Box<Expr>, true_expr: Box<Expr>, false_expr: Box<Expr>",
             "Variable : token: Token",
-            "Assign   : token: Token, value: Box<Expr>"
+            "Assign   : token: Token, assignment_token: Token, value: Box<Expr>"
         ]
     )?;
 

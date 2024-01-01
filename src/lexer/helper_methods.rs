@@ -151,5 +151,11 @@ impl<'a> Lexer<'a> {
         } else {
             self.add_token(TokenType::Identifier);
         }
+
+        if self.peek() == Some('!') {
+            self.start = self.current;
+            self.advance();
+            self.add_token(TokenType::Factorial)
+        }
     }
 }

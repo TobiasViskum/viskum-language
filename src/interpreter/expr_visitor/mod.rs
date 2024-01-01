@@ -85,9 +85,11 @@ impl<'a> ExprVisitor<Output> for Interpreter<'a> {
         match expr.operator.ttype {
             TokenType::Factorial => {
                 match left {
-                    Literal::Num(x) => Ok(Literal::Num(factorial(x))),
-                    lit =>
-                        Err(
+                    Literal::Num(x) => {
+                        return Ok(Literal::Num(factorial(x)));
+                    }
+                    lit => {
+                        return Err(
                             ViskumError::new(
                                 format!(
                                     "{} is not defined for {}",
@@ -97,17 +99,19 @@ impl<'a> ExprVisitor<Output> for Interpreter<'a> {
                                 expr.operator.clone(),
                                 "file.vs"
                             )
-                        ),
+                        );
+                    }
                 }
             }
-            _ =>
-                Err(
+            _ => {
+                return Err(
                     ViskumError::new(
                         format!("Invalid postfix: {}", expr.operator.lexeme).as_str(),
                         expr.operator.clone(),
                         "file.vs"
                     )
-                ),
+                );
+            }
         }
     }
 
@@ -128,12 +132,87 @@ impl<'a> ExprVisitor<Output> for Interpreter<'a> {
     }
 
     fn visit_assign_expr(&self, expr: &AssignExpr) -> Result<Output, ViskumError> {
-        Ok(
-            self.environment_assign(
-                &expr.token,
-                EnvironmentValue::new(self.evaluate(&expr.value)?, false)
-            )?
-        )
+        match expr.assignment_token.ttype {
+            | TokenType::Equal
+            | TokenType::PlusEqual
+            | TokenType::MinusEqual
+            | TokenType::StarEqual
+            | TokenType::SlashEqual
+            | TokenType::PowerEqual => {
+                let left = self.environment_get(&expr.token)?;
+
+                let right = self.evaluate(&expr.value)?;
+
+                let new_value = match expr.assignment_token.ttype {
+                    TokenType::Equal => right,
+                    TokenType::PlusEqual => binary_operations::plus(&left, &right)?,
+                    TokenType::MinusEqual => binary_operations::minus(&left, &right)?,
+                    TokenType::StarEqual => binary_operations::multiplication(&left, &right)?,
+                    TokenType::SlashEqual => binary_operations::division(&left, &right)?,
+                    TokenType::PowerEqual => binary_operations::exponential(&left, &right)?,
+                    _ => {
+                        return Err(
+                            ViskumError::new(
+                                format!(
+                                    "{} is not defined for {}",
+                                    expr.assignment_token.lexeme,
+                                    left.to_type_string()
+                                ).as_str(),
+                                expr.assignment_token.clone(),
+                                "file.vs"
+                            )
+                        );
+                    }
+                };
+
+                return Ok(
+                    self.environment_assign(&expr.token, EnvironmentValue::new(new_value, false))?
+                );
+            }
+            TokenType::Increment | TokenType::Decrement => {
+                let adjustment = match expr.assignment_token.ttype {
+                    TokenType::Increment => 1.0,
+                    TokenType::Decrement => -1.0,
+                    _ => 0.0,
+                };
+
+                let variable_value = self.environment_get(&expr.token)?;
+                let variable_number = variable_value.to_num();
+
+                match variable_number {
+                    Ok(x) => {
+                        return Ok(
+                            self.environment_assign(
+                                &expr.token,
+                                EnvironmentValue::new(Literal::Num(x + adjustment), false)
+                            )?
+                        );
+                    }
+                    Err(_) => {
+                        return Err(
+                            ViskumError::new(
+                                format!(
+                                    "{} is not defined for {}",
+                                    expr.assignment_token.lexeme,
+                                    variable_value.to_type_string()
+                                ).as_str(),
+                                expr.assignment_token.clone(),
+                                "file.vs"
+                            )
+                        );
+                    }
+                }
+            }
+            _ => {
+                return Err(
+                    ViskumError::new(
+                        format!("Invalid assignment: {}", expr.assignment_token.lexeme).as_str(),
+                        expr.assignment_token.clone(),
+                        "file.vs"
+                    )
+                );
+            }
+        }
     }
 
     fn visit_logical_expr(&self, expr: &LogicalExpr) -> Result<Output, ViskumError> {

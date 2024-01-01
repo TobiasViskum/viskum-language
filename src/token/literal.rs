@@ -17,6 +17,13 @@ impl Literal {
             Literal::Str(_) => "string".to_string(),
         }
     }
+
+    pub fn to_num(&self) -> Result<f64, ()> {
+        match self {
+            Literal::Num(x) => Ok(*x),
+            _ => Err(()),
+        }
+    }
 }
 
 impl fmt::Display for Literal {

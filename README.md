@@ -18,6 +18,28 @@ If you want the variable to mutable, you follow the Rust syntax (not implemented
 let mut a = 2
 ```
 
+### Variable assignment
+
+Any variable can be set to a new value of the same type with the '=' operator:
+
+```
+let a = "initial value"
+a = "new value"
+```
+
+Any variable of type number can also be assigned with the following operators:
+
+```
+let a = 5
+a += 1 // a: 6
+a -= 2 // a: 4
+a *= 3 // a: 12
+a /= 6 // a: 2
+a ^= 3 // a: 8
+a++ // a: 9
+a-- // a:8
+```
+
 ### Extended mathematical operations
 
 Factorial (5! = 5 \* 4 \* 3 \* 2 \* 1):

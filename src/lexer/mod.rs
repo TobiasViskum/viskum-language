@@ -1,5 +1,4 @@
 use std::cell::RefCell;
-use std::rc::Rc;
 
 mod get_keyword;
 mod helper_methods;
@@ -67,11 +66,39 @@ impl<'a> Lexer<'a> {
             '}' => self.add_token(TokenType::RightBrace),
             ',' => self.add_token(TokenType::Comma),
             '.' => self.add_token(TokenType::Dot),
-            '-' => self.add_token(TokenType::Minus),
-            '+' => self.add_token(TokenType::Plus),
+            '-' => {
+                if self.match_char('-') {
+                    self.add_token(TokenType::Decrement)
+                } else if self.match_char('=') {
+                    self.add_token(TokenType::MinusEqual)
+                } else {
+                    self.add_token(TokenType::Minus)
+                }
+            }
+            '+' => {
+                if self.match_char('+') {
+                    self.add_token(TokenType::Increment)
+                } else if self.match_char('=') {
+                    self.add_token(TokenType::PlusEqual)
+                } else {
+                    self.add_token(TokenType::Plus)
+                }
+            }
             ';' => self.add_token(TokenType::Semicolon),
-            '*' => self.add_token(TokenType::Star),
-            '^' => self.add_token(TokenType::Power),
+            '*' => {
+                if self.match_char('=') {
+                    self.add_token(TokenType::StarEqual)
+                } else {
+                    self.add_token(TokenType::Star)
+                }
+            }
+            '^' => {
+                if self.match_char('=') {
+                    self.add_token(TokenType::PowerEqual)
+                } else {
+                    self.add_token(TokenType::Power)
+                }
+            }
             ':' => self.add_token(TokenType::Colon),
             '?' => self.add_token(TokenType::QuestionMark),
             '!' => {
@@ -103,7 +130,9 @@ impl<'a> Lexer<'a> {
                 }
             }
             '/' => {
-                if self.match_char('/') {
+                if self.match_char('=') {
+                    self.add_token(TokenType::SlashEqual)
+                } else if self.match_char('/') {
                     while let Some(ch) = self.peek() {
                         if ch == '\n' {
                             break;

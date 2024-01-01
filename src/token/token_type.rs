@@ -16,6 +16,14 @@ pub enum TokenType {
     Power,
     Factorial,
 
+    Increment,
+    Decrement,
+    PlusEqual,
+    MinusEqual,
+    StarEqual,
+    SlashEqual,
+    PowerEqual,
+
     Bang,
     BangEqual,
     Equal,
@@ -81,6 +89,14 @@ impl TokenType {
             Self::Star => "*",
             Self::Power => "^",
             Self::Factorial => "!",
+
+            Self::Increment => "++",
+            Self::Decrement => "--",
+            Self::PlusEqual => "+=",
+            Self::MinusEqual => "-=",
+            Self::StarEqual => "*=",
+            Self::SlashEqual => "/=",
+            Self::PowerEqual => "^=",
 
             Self::Bang => "!",
             Self::BangEqual => "!=",
