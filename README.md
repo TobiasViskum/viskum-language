@@ -42,6 +42,20 @@ a++ // a: 9
 a-- // a: 8
 ```
 
+### Comparison
+
+Equals: ==
+
+Not equal: !=
+
+Greater than: >
+
+Greater than or equal to: >=
+
+Less than: <
+
+Less than or equal to: <=
+
 ### Extended mathematical operations
 
 Factorial (5! = 5 \* 4 \* 3 \* 2 \* 1):
@@ -53,10 +67,20 @@ Factorial (5! = 5 \* 4 \* 3 \* 2 \* 1):
 Raise a number to the power of x:
 
 ```
-5^2 = 25
+(-5)^2 = 25
+-5^2 = -25 // This doesn't work for some reason (equals to 25). Will be fixed.
 ```
 
-And then there are all the standard operations as well, that you see in most programming languages.
+And then there are all the standard operations as well, that you see in most programming languages like multiplication, addition, subraction and division (root of x will be implemented in the future).
+
+### Negation
+
+```
+!true = false
+!0 = true
+!5 = false
+!null = true
+```
 
 ### Ternary operator
 
