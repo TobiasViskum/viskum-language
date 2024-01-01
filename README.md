@@ -142,17 +142,6 @@ loop {
 
 - Loops (loop, for value in arr {}, for i = 0; i < 2; i++ {})
 - Functions
-- Support for increment (++)
-- Support for decrement (--)
-- Support for increment and assign (+=)
-- Support for decrement and assign (-=)
-- Support for break keyword
-
-Maybe support for these as well:
-
-- variable \*= 2;
-- variable /= 2;
-- variable ^= 2;
 
 ## Advanced pre-runtime error checker (todo)
 
