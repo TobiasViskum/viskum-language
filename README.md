@@ -151,3 +151,7 @@ loop {
 - Check for non-mutable variables that's assigned to a new value (error)
 
 - Check for unused variables (warning)
+
+## Other
+
+- Total lines in project: 2691 (wc -l src/\*\*/\*.rs build/\*\*/\*.rs)
