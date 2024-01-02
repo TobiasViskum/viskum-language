@@ -3,7 +3,7 @@ use crate::{
     stmt::FunctionStmt,
     interpreter::Interpreter,
     token::Literal,
-    error_handler::ViskumError,
+    error_handler::{ ViskumError, AbortReason },
     environment::{ Environment, environment_value::EnvironmentValue },
 };
 
@@ -26,7 +26,16 @@ impl ViskumCallable for ViskumFunction {
             environment.define(param, EnvironmentValue::new(args[i].clone(), false))?;
         }
 
-        interpreter.execute_block(&self.declaration.body, environment)?;
+        match interpreter.execute_block(&self.declaration.body, environment) {
+            Ok(_) => (),
+            Err(e) => {
+                if let Some(abort_value) = e.get_abort_value() {
+                    if e.is_abort_error(AbortReason::Return(abort_value.clone())) {
+                        return Ok(abort_value);
+                    }
+                }
+            }
+        }
 
         Ok(Literal::Null)
     }

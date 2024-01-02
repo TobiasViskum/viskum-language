@@ -1,10 +1,13 @@
 fn new_function(str) {
-  print "Works!" + str;
+  return "Works!" + str;
 }
 
-new_function(" argument");
+
+
+print new_function(" argument");
 
 /*
+
 let start_time = time();
 let a = 8!;
 let b = 16!;
@@ -39,4 +42,5 @@ print "Finished";
 1 + 1 == 2 ? "this is cool or" : "not";
 
 print time() - start_time;
+
 */

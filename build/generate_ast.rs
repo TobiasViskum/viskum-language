@@ -39,7 +39,8 @@ pub fn generate_ast(output_dir: &String) -> io::Result<()> {
             "While       : condition: Expr, body: Box<Stmt>",
             "LoopControl : keyword: Token",
             "Loop        : body: Box<Stmt>",
-            "Function    : token: Token, params: Vec<Token>, body: Vec<Stmt>"
+            "Function    : token: Token, params: Vec<Token>, body: Vec<Stmt>",
+            "Return      : keyword: Token, value: Option<Expr>"
         ]
     )?;
 

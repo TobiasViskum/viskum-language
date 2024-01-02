@@ -1,11 +1,12 @@
 use colorize::{ self, AnsiColor };
 
-use crate::token::Token;
+use crate::token::{ Token, Literal };
 
 #[derive(Debug, PartialEq)]
 pub enum AbortReason {
     Break,
     Continue,
+    Return(Literal),
 }
 
 #[derive(Debug)]
@@ -14,11 +15,18 @@ pub struct ViskumError {
     token: Token,
     file: String,
     abort_reason: Option<AbortReason>,
+    abort_value: Option<Literal>,
 }
 
 impl ViskumError {
     pub fn new(msg: &str, token: Token, file: &str) -> Self {
-        ViskumError { msg: msg.to_string(), token, file: file.to_string(), abort_reason: None }
+        ViskumError {
+            msg: msg.to_string(),
+            token,
+            file: file.to_string(),
+            abort_reason: None,
+            abort_value: None,
+        }
     }
     pub fn new_with_abort(msg: &str, token: Token, file: &str, reason: AbortReason) -> Self {
         ViskumError {
@@ -26,14 +34,25 @@ impl ViskumError {
             token,
             file: file.to_string(),
             abort_reason: Some(reason),
+            abort_value: None,
         }
     }
 
     pub fn is_abort_error(&self, abort_reason: AbortReason) -> bool {
         match &self.abort_reason {
+            Some(AbortReason::Return(_)) => true,
             Some(reason) => reason == &abort_reason,
             None => false,
         }
+    }
+
+    pub fn get_abort_value(&self) -> Option<Literal> {
+        self.abort_reason.as_ref().and_then(|reason| {
+            match reason {
+                AbortReason::Return(value) => Some(value.clone()),
+                _ => None,
+            }
+        })
     }
 
     pub fn to_string(&self) -> String {

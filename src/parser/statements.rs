@@ -1,4 +1,9 @@
-use crate::{ stmt::*, token::TokenType, error_handler::ViskumError };
+use crate::{
+    stmt::*,
+    token::{ TokenType, Literal },
+    error_handler::ViskumError,
+    expr::{ Expr, LiteralExpr },
+};
 
 use super::Parser;
 
@@ -71,5 +76,18 @@ impl<'a> Parser<'a> {
         self.consume(TokenType::RightBrace, "Expected '}' after block")?;
 
         Ok(statements)
+    }
+
+    pub(super) fn return_statement(&mut self) -> Result<Stmt, ViskumError> {
+        let keyword = self.peek_previous()?;
+        let value = if !self.check(&TokenType::Semicolon)? {
+            self.expression()?
+        } else {
+            Expr::Literal(LiteralExpr { value: Some(Literal::Null) })
+        };
+
+        self.consume(TokenType::Semicolon, "Expected ';' after return value")?;
+
+        Ok(Stmt::Return(ReturnStmt { keyword: keyword, value: Some(value) }))
     }
 }

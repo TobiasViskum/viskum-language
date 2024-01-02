@@ -49,7 +49,9 @@ impl<'a> Parser<'a> {
     }
 
     fn statement(&mut self) -> Result<Stmt, ViskumError> {
-        if self.match_tokens(&[TokenType::While])? {
+        if self.match_tokens(&[TokenType::Return])? {
+            self.return_statement()
+        } else if self.match_tokens(&[TokenType::While])? {
             self.while_statement()
         } else if self.match_tokens(&[TokenType::Loop])? {
             self.loop_statement()

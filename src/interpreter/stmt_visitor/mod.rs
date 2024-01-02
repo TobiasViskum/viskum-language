@@ -134,4 +134,21 @@ impl<'a> StmtVisitor<Output> for Interpreter<'a> {
 
         Ok(())
     }
+
+    fn visit_return_stmt(&self, stmt: &ReturnStmt) -> Result<Output, ViskumError> {
+        let value = if let Some(value) = &stmt.value {
+            self.evaluate(&value)?
+        } else {
+            Literal::Null
+        };
+
+        Err(
+            ViskumError::new_with_abort(
+                "Unexptected return statement. Must be inside of a function",
+                stmt.keyword.clone(),
+                "file.vs",
+                AbortReason::Return(value)
+            )
+        )
+    }
 }
