@@ -193,6 +193,7 @@ Prints:
 
 - For loops
 - Do more chapters in the book (I'm at chapter 11)
+- Explicit types
 
 ## Advanced pre-runtime error checker (todo)
 
