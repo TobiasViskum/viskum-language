@@ -1,10 +1,16 @@
 mod helper_methods;
 
+use std::rc::Rc;
+
+use statrs::function;
+
 use crate::{
     stmt::*,
     error_handler::{ ViskumError, AbortReason },
     environment::{ environment_value::EnvironmentValue, Environment },
-    token::TokenType,
+    token::{ TokenType, Literal },
+    viskum_function::ViskumFunction,
+    viskum_callable::Callable,
 };
 
 use super::Interpreter;
@@ -113,5 +119,19 @@ impl<'a> StmtVisitor<Output> for Interpreter<'a> {
                     )
                 ),
         }
+    }
+
+    fn visit_function_stmt(&self, stmt: &FunctionStmt) -> Result<Output, ViskumError> {
+        let function = ViskumFunction::new(stmt.clone());
+
+        self.environment_define(
+            &stmt.token,
+            EnvironmentValue::new(
+                Literal::Func(Callable { func: Rc::new(function), arity: stmt.params.len() }),
+                false
+            )
+        )?;
+
+        Ok(())
     }
 }

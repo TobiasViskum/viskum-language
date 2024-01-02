@@ -21,6 +21,7 @@ pub fn get_keyword(check: String) -> Option<TokenType> {
         "break" => Some(TokenType::Break),
         "continue" => Some(TokenType::Continue),
         "loop" => Some(TokenType::Loop),
+        "fn" => Some(TokenType::Fn),
         _ => None,
     }
 }

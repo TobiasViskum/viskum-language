@@ -24,7 +24,10 @@ impl<'a> Interpreter<'a> {
         error_handler: &'a RefCell<ErrorHandler>,
         environment: &'a RefCell<Rc<RefCell<Environment>>>
     ) -> Self {
-        Interpreter { error_handler: error_handler, environment: environment }
+        Interpreter {
+            error_handler: error_handler,
+            environment: environment,
+        }
     }
 
     pub fn interpret(&self, statements: Vec<Stmt>) {

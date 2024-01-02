@@ -35,6 +35,8 @@ impl<'a> Parser<'a> {
     fn declaration(&mut self) -> Result<Stmt, ViskumError> {
         let result = if self.match_tokens(&[TokenType::Let])? {
             self.variable_declaration()
+        } else if self.match_tokens(&[TokenType::Fn])? {
+            self.function_declaration("function".to_string())
         } else {
             self.statement()
         };

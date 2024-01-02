@@ -1,4 +1,6 @@
 pub mod environment_value;
+mod globals;
+mod native_functions;
 
 use std::{ collections::HashMap, cell::RefCell, rc::Rc };
 
@@ -14,7 +16,9 @@ pub struct Environment {
 
 impl Environment {
     pub fn new() -> Self {
-        Environment { values: HashMap::new(), enclosing: None }
+        let globals = globals::get_globals();
+
+        Environment { values: globals, enclosing: None }
     }
 
     pub fn new_with_enclosing(environment: Rc<RefCell<Environment>>) -> Self {
@@ -35,6 +39,13 @@ impl Environment {
                 )
             )
         }
+    }
+
+    pub fn define_function(&mut self, function_name: &str, viskum_callable: Literal) {
+        self.values.insert(
+            function_name.to_string(),
+            EnvironmentValue::new(viskum_callable, false)
+        );
     }
 
     pub fn define(

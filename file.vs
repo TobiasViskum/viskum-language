@@ -1,6 +1,15 @@
-print -5^2;
+fn new_function(str) {
+  print "Works!" + str;
+}
+
+new_function(" argument");
 
 /*
+let start_time = time();
+let a = 8!;
+let b = 16!;
+let c = 24!;
+
 let result = "No match";
 
 if 1 + 2 == 2 {
@@ -20,23 +29,14 @@ let count = 0;
 while count < 10 {
   count = count + 1;
   print count;
+  continue;
 }
 
-print("Finished");
-*/
+print "Finished";
 
-/*
-if 1 + 1 == 2 ? "this is cool or" : "not"
 
-let a = 4, b = 2, c = true;
 
-let number = match "32".to_number() {
-    Ok(v) => v,
-    Err(e) => {
-        print("Could not convert str to num");
-        32
-    }
-}
+1 + 1 == 2 ? "this is cool or" : "not";
 
-"hejsa2".to_number()
+print time() - start_time;
 */

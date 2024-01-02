@@ -8,7 +8,7 @@ use crate::{
 };
 
 impl<'a> Interpreter<'a> {
-    pub(super) fn execute_block(
+    pub fn execute_block(
         &self,
         statements: &[Stmt],
         environment: Environment

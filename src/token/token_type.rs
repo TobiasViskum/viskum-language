@@ -56,6 +56,7 @@ pub enum TokenType {
     Break,
     Continue,
     Loop,
+    Fn,
 
     Eof,
 
@@ -133,6 +134,7 @@ impl TokenType {
             Self::Break => "break",
             Self::Continue => "continue",
             Self::Loop => "loop",
+            Self::Fn => "fn",
 
             Self::Eof => "end of file",
 

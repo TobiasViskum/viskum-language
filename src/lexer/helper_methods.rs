@@ -13,6 +13,7 @@ impl<'a> Lexer<'a> {
 
     pub(super) fn add_token_literal(&mut self, ttype: TokenType, literal: Option<Literal>) {
         let lexeme: String = self.source[self.start..self.current].iter().collect();
+
         self.tokens.push(Token::new(ttype, lexeme, literal, self.line))
     }
 

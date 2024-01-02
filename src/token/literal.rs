@@ -1,10 +1,13 @@
 use std::fmt;
 
+use crate::viskum_callable::Callable;
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum Literal {
     Num(f64),
     Str(String),
     Bool(bool),
+    Func(Callable),
     Null,
 }
 
@@ -15,6 +18,7 @@ impl Literal {
             Literal::Null => "null".to_string(),
             Literal::Num(_) => "number".to_string(),
             Literal::Str(_) => "string".to_string(),
+            Literal::Func(_) => "function".to_string(),
         }
     }
 
@@ -33,6 +37,7 @@ impl fmt::Display for Literal {
             Literal::Str(str) => write!(f, "{str}"),
             Literal::Null => write!(f, "null"),
             Literal::Bool(b) => if *b { write!(f, "true") } else { write!(f, "false") }
+            Literal::Func(func) => write!(f, "{:?}", func),
         }
     }
 }

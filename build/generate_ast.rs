@@ -14,6 +14,7 @@ pub fn generate_ast(output_dir: &String) -> io::Result<()> {
         vec!["error_handler::ViskumError", "token::Token", "token::Literal"],
         vec![
             "Binary   : left: Box<Expr>, operator: Token, right: Box<Expr>",
+            "Call     : callee: Box<Expr>, paren: Token, arguments: Vec<Expr>",
             "Grouping : expression: Box<Expr>",
             "Literal  : value: Option<Literal>",
             "Logical  : left: Box<Expr>, operator: Token, right: Box<Expr>",
@@ -22,7 +23,6 @@ pub fn generate_ast(output_dir: &String) -> io::Result<()> {
             "Ternary  : condition: Box<Expr>, true_expr: Box<Expr>, false_expr: Box<Expr>",
             "Variable : token: Token",
             "Assign   : token: Token, assignment_token: Token, value: Box<Expr>"
-            // A single expression for "break" and "continue". What should they be called?
         ]
     )?;
 
@@ -38,7 +38,8 @@ pub fn generate_ast(output_dir: &String) -> io::Result<()> {
             "Let         : token: Token, initializer: Expr",
             "While       : condition: Expr, body: Box<Stmt>",
             "LoopControl : keyword: Token",
-            "Loop        : body: Box<Stmt>"
+            "Loop        : body: Box<Stmt>",
+            "Function    : token: Token, params: Vec<Token>, body: Vec<Stmt>"
         ]
     )?;
 
@@ -79,7 +80,7 @@ fn define_ast(
         });
     }
 
-    writeln!(file, "#[derive(Debug)]")?;
+    writeln!(file, "#[derive(Debug, Clone)]")?;
     writeln!(file, "pub enum {base_name} {{")?;
     for tree_type in &tree_types {
         let base_class_name = &tree_type.base_class_name;
@@ -108,7 +109,7 @@ fn define_ast(
     for tt in &tree_types {
         // let base_class_name = &tree_type.base_class_name;
         let class_name = &tt.class_name;
-        writeln!(file, "#[derive(Debug)]")?;
+        writeln!(file, "#[derive(Debug, Clone)]")?;
         writeln!(file, "pub struct {class_name} {{")?;
         for field in &tt.fields {
             writeln!(file, "    pub {field},")?;

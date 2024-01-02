@@ -10,6 +10,9 @@ mod expr;
 mod stmt;
 mod ast_printer;
 mod environment;
+mod viskum_callable;
+mod viskum_function;
+
 use print_util::print_error;
 use run::Viskum;
 use std::env::args;

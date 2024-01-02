@@ -12,10 +12,11 @@ use crate::{
         VariableExpr,
         AssignExpr,
         LogicalExpr,
+        CallExpr,
     },
     error_handler::ViskumError,
-    token::{ TokenType, Literal },
-    stmt::{ Stmt, LetStmt },
+    token::{ TokenType, Literal, Token },
+    stmt::{ Stmt, LetStmt, FunctionStmt },
     util::report_error,
 };
 
@@ -34,6 +35,54 @@ impl<'a> Parser<'a> {
         self.consume(TokenType::Semicolon, "Expected ';' after variable declaration")?;
 
         Ok(Stmt::Let(LetStmt { token: token, initializer: initializer }))
+    }
+
+    pub(super) fn function_declaration(&mut self, kind: String) -> Result<Stmt, ViskumError> {
+        let function_token = self.consume_and_get(
+            TokenType::Identifier,
+            format!("Expected {} name", kind).as_str()
+        )?;
+        self.consume(TokenType::LeftParen, format!("Expected '(' after {} name", kind).as_str())?;
+
+        let mut params: Vec<Token> = Vec::new();
+
+        if !self.check(&TokenType::RightParen)? {
+            loop {
+                if params.len() >= 255 {
+                    report_error(
+                        self.error_handler,
+                        ViskumError::new(
+                            "Cannot have more than 255 parameters",
+                            self.peek()?,
+                            "file.vs"
+                        )
+                    );
+                }
+
+                params.push(
+                    self.consume_and_get(TokenType::Identifier, "Expected parameter name")?
+                );
+
+                if !self.match_tokens(&[TokenType::Comma])? {
+                    break;
+                }
+            }
+        }
+        self.consume(
+            TokenType::RightParen,
+            format!("Expected ')' after {} parameters", kind).as_str()
+        )?;
+        self.consume(TokenType::LeftBrace, format!("Expected '{{' before {} body", kind).as_str())?;
+
+        let body = self.block()?;
+
+        Ok(
+            Stmt::Function(FunctionStmt {
+                token: function_token,
+                params,
+                body,
+            })
+        )
     }
 
     pub(super) fn expression(&mut self) -> Result<Expr, ViskumError> {
@@ -95,33 +144,6 @@ impl<'a> Parser<'a> {
                 );
             }
         }
-        //  else if self.match_tokens(&[TokenType::Increment, TokenType::Decrement])? {
-        //     if let Expr::Variable(var_expr) = expr.borrow() {
-        //         return Ok(
-        //             Expr::Assign(AssignExpr {
-        //                 token: var_expr.token.clone(),
-
-        //                 value: Box::from(
-        //                     Expr::Postfix(PostfixExpr {
-        //                         left: Box::from(expr),
-        //                         operator: self.peek_previous()?,
-        //                     })
-        //                 ),
-        //             })
-        //         );
-        //     } else {
-        //         let equals = self.peek_previous()?;
-
-        //         report_error(
-        //             self.error_handler,
-        //             ViskumError::new(
-        //                 format!("Invalid assignment target at '{}'", equals.lexeme).as_str(),
-        //                 equals,
-        //                 "file.vs"
-        //             )
-        //         );
-        //     }
-        // }
 
         Ok(expr)
     }
@@ -258,27 +280,56 @@ impl<'a> Parser<'a> {
             return Ok(Expr::Prefix(PrefixExpr { operator: operator, right: Box::from(right) }));
         }
 
-        Ok(self.primary()?)
+        Ok(self.call()?)
     }
 
-    // fn postfix(&mut self) -> Result<Expr, ViskumError> {
-    //     println!("{}", self.peek()?);
-    //     println!("{}", self.peek_previous()?);
-    //     if
-    //         self.match_next_tokens(
-    //             &[TokenType::Factorial, TokenType::Increment, TokenType::Decrement]
-    //         )?
-    //     {
-    //         let operator = self.peek_next()?;
-    //         let left = self.primary()?;
+    fn call(&mut self) -> Result<Expr, ViskumError> {
+        let mut expr = self.primary()?;
 
-    //         self.advance()?;
+        loop {
+            if self.match_tokens(&[TokenType::LeftParen])? {
+                expr = self.finish_call(expr)?;
+            } else {
+                break;
+            }
+        }
 
-    //         return Ok(Expr::Postfix(PostfixExpr { left: Box::from(left), operator: operator }));
-    //     }
+        Ok(expr)
+    }
 
-    //     Ok(self.primary()?)
-    // }
+    fn finish_call(&mut self, calle: Expr) -> Result<Expr, ViskumError> {
+        let mut arguments: Vec<Expr> = Vec::new();
+
+        if !self.check(&TokenType::RightParen)? {
+            arguments.push(self.expression()?);
+            while self.match_tokens(&[TokenType::Comma])? {
+                if arguments.len() >= 255 {
+                    report_error(
+                        self.error_handler,
+                        ViskumError::new(
+                            "Cannot have more than 255 arguments",
+                            self.peek_previous()?,
+                            "file.vs"
+                        )
+                    );
+                }
+                arguments.push(self.expression()?);
+            }
+        }
+
+        let paren = self.consume_and_get(
+            TokenType::RightParen,
+            "Expected ')' after function arguments"
+        )?;
+
+        Ok(
+            Expr::Call(CallExpr {
+                callee: Box::from(calle),
+                paren: paren,
+                arguments: arguments,
+            })
+        )
+    }
 
     fn primary(&mut self) -> Result<Expr, ViskumError> {
         if self.match_tokens(&[TokenType::False])? {

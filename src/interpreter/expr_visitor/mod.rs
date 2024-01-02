@@ -1,4 +1,5 @@
 mod binary_operations;
+use crate::viskum_callable::ViskumCallable;
 
 use crate::{
     expr::*,
@@ -242,6 +243,42 @@ impl<'a> ExprVisitor<Output> for Interpreter<'a> {
                     )
                 );
             }
+        }
+    }
+
+    fn visit_call_expr(&self, expr: &CallExpr) -> Result<Output, ViskumError> {
+        let callee = self.evaluate(&expr.callee)?;
+
+        let mut arguments = Vec::new();
+
+        for argument in &expr.arguments {
+            arguments.push(self.evaluate(argument)?);
+        }
+
+        if let Literal::Func(func) = callee {
+            if arguments.len() != func.arity {
+                return Err(
+                    ViskumError::new(
+                        format!(
+                            "Expected {} arguments but received {}",
+                            func.arity,
+                            arguments.len()
+                        ).as_str(),
+                        expr.paren.clone(),
+                        "file.vs"
+                    )
+                );
+            }
+
+            return Ok(func.call(self, &arguments)?);
+        } else {
+            return Err(
+                ViskumError::new(
+                    format!("A {} is not callable", callee.to_type_string()).as_str(),
+                    expr.paren.clone(),
+                    "file.vs"
+                )
+            );
         }
     }
 }
