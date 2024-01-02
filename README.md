@@ -162,10 +162,37 @@ loop {
 }
 ```
 
+### Functions
+
+Native functions:
+
+```
+time() // Get's the current time in seconds
+```
+
+User functions:
+
+```
+fn new_function(some_str, some_number) {
+    print "Argument 1: " + some_str
+    print 5 * some_number
+}
+
+new_function("Some string", 5)
+
+/*
+Prints:
+
+"Argument 1: Some string"
+25
+*/
+
+```
+
 ## Todo
 
 - For loops
-- Functions
+- Do more chapters in the book (I'm at chapter 11)
 
 ## Advanced pre-runtime error checker (todo)
 
@@ -178,4 +205,4 @@ loop {
 
 ## Other
 
-- Total lines in project: 2691 (wc -l src/\*\*/\*.rs build/\*\*/\*.rs)
+- Total lines in project: 3026 (wc -l (src|build)/\*\*/\*.rs)
