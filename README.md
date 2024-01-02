@@ -167,7 +167,7 @@ loop {
 Native functions:
 
 ```
-time() // Get's the current time in seconds
+time() // Gets the current time in seconds
 ```
 
 User functions:
