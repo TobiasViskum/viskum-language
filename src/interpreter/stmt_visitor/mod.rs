@@ -1,8 +1,6 @@
 mod helper_methods;
 
-use std::rc::Rc;
-
-use statrs::function;
+use std::{ rc::Rc, cell::RefCell };
 
 use crate::{
     stmt::*,
@@ -20,7 +18,10 @@ type Output = ();
 impl<'a> StmtVisitor<Output> for Interpreter<'a> {
     fn visit_block_stmt(&self, stmt: &BlockStmt) -> Result<Output, ViskumError> {
         let e = self.environment.borrow().clone();
-        self.execute_block(&stmt.statements, Environment::new_with_enclosing(e))
+        self.execute_block(
+            &stmt.statements,
+            Rc::new(RefCell::new(Environment::new_with_enclosing(e)))
+        )
     }
 
     fn visit_expression_stmt(&self, stmt: &ExpressionStmt) -> Result<Output, ViskumError> {
@@ -122,7 +123,7 @@ impl<'a> StmtVisitor<Output> for Interpreter<'a> {
     }
 
     fn visit_function_stmt(&self, stmt: &FunctionStmt) -> Result<Output, ViskumError> {
-        let function = ViskumFunction::new(stmt.clone());
+        let function = ViskumFunction::new(stmt.clone(), self.environment.borrow().clone());
 
         self.environment_define(
             &stmt.token,

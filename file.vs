@@ -1,10 +1,17 @@
-fn new_function(str) {
-  return "Works!" + str;
+fn fib(n) {
+  if n <= 1 {
+    return n;
+  }
+  return fib(n - 2) + fib(n - 1);
+}
+
+let i = 0;
+while i < 30 {
+  i = i + 1;
+  print fib(i);
 }
 
 
-
-print new_function(" argument");
 
 /*
 

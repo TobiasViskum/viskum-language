@@ -11,9 +11,9 @@ impl<'a> Interpreter<'a> {
     pub fn execute_block(
         &self,
         statements: &[Stmt],
-        environment: Environment
+        environment: Rc<RefCell<Environment>>
     ) -> Result<(), ViskumError> {
-        let previous = self.environment.replace(Rc::new(RefCell::new(environment)));
+        let previous = self.environment.replace(environment);
 
         let result = statements.iter().try_for_each(|stmt| self.execute(stmt));
 
