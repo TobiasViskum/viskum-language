@@ -1,5 +1,7 @@
 # The Viskum programming language
 
+<b>I'm working on a faster version right here: https://github.com/TobiasViskum/viskum-bytecode (chapter 15+)</b>
+
 An interpreter for the Viskum Programming Language
 
 I'm following this book: https://craftinginterpreters.com/contents.html. I'm writing it in Rust instead of Java, adding additional features and using my own syntax.

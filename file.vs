@@ -1,16 +1,11 @@
-fn fib(n) {
-  if n <= 1 {
-    return n;
-  }
-  return fib(n - 2) + fib(n - 1);
+let a = 2;
+let b = 3;
+
+fn new_func(a) {
+  print a;
 }
 
-let i = 0;
-while i < 30 {
-  i = i + 1;
-  print fib(i);
-}
-
+new_func(b);
 
 
 /*
